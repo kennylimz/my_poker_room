@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Search Result</title>
+    </head>
+    <body>
+        <p>Results:</p>
+        <table id = "usertable">
+            <tr>
+                <th>id</th>
+                <th>username</th>
+                <th>password</th>
+                <th>nickname</th>
+                <th colspan="3">操作</th>
+            </tr>
+            <tr>
+                <form action="/manager"><input type="submit" value="返回"></form>
+            </tr>
+        </table>
+    </body>
+</html>
+
+<script th:inline="javascript">
+    var userList = [[${userList}]];
+    var userTable = document.getElementById("usertable");
+    for (var i=0; i<userList.length; i++){
+        var tr = document.createElement('tr');
+        for (var j in userList[i]){
+            var td = document.createElement('td');
+            td.innerHTML = userList[i][j];
+            tr.appendChild(td);
+        }
+        var cur_id = userList[i][0];
+        var cur_un = userList[i][1];
+        var cur_pw = userList[i][2];
+        var td_del = document.createElement("td");
+        var td_log = document.createElement("td");
+        var form_del = document.createElement("form");
+        var text_del = document.createElement("input");
+        var subm_del = document.createElement("input");
+        form_del.setAttribute("role","form");
+        form_del.setAttribute("method","post");
+        form_del.setAttribute("action","/delUser");
+        text_del.setAttribute("type","text");
+        text_del.setAttribute("hidden","true");
+        text_del.setAttribute("id","idToDel");
+        text_del.setAttribute("name","idToDel");
+        text_del.setAttribute("value",cur_id);
+        subm_del.setAttribute("type","submit");
+        subm_del.setAttribute("id","toDel");
+        subm_del.setAttribute("value","删除");
+        form_del.appendChild(text_del);
+        form_del.appendChild(subm_del);
+        td_del.appendChild(form_del);
+        tr.appendChild(td_del);
+        var form_log = document.createElement("form");
+        var un_log = document.createElement("input");
+        var pw_log = document.createElement("input");
+        var subm_log = document.createElement("input");
+        form_log.setAttribute("role","form");
+        form_log.setAttribute("method","post");
+        form_log.setAttribute("action","/managerLogIn");
+        un_log.setAttribute("type","text");
+        un_log.setAttribute("hidden","true");
+        un_log.setAttribute("id","loginusername");
+        un_log.setAttribute("name","loginusername");
+        un_log.setAttribute("value",cur_un);
+        pw_log.setAttribute("type","text");
+        pw_log.setAttribute("hidden","true");
+        pw_log.setAttribute("id","loginpassword");
+        pw_log.setAttribute("name","loginpassword");
+        pw_log.setAttribute("value",cur_pw);
+        subm_log.setAttribute("type","submit");
+        subm_log.setAttribute("id","toLogin");
+        subm_log.setAttribute("value","登录");
+        form_log.appendChild(un_log);
+        form_log.appendChild(pw_log);
+        form_log.appendChild(subm_log);
+        td_log.appendChild(form_log);
+        tr.appendChild(td_log);
+        var td_edit = document.createElement("td");
+        var btn_edit = document.createElement("input");
+        btn_edit.setAttribute("type","button");
+        btn_edit.setAttribute("name","btn_edit");
+        btn_edit.setAttribute("id","btn_edit");
+        btn_edit.setAttribute("value","编辑");
+        btn_edit.setAttribute("onclick","editRow(this);");
+        btn_edit.setAttribute("class","EditBtn");
+        td_edit.appendChild(btn_edit);
+        tr.appendChild(td_edit);
+        userTable.appendChild(tr);
+    }
+
+    function editRow(object){
+        var tr = object.parentNode.parentNode;
+        var id = tr.cells[0].innerHTML;
+        tr.cells[0].innerHTML = "<input form='editUser' type='text' readonly='readonly' id='edit_id' name='edit_id' value='"+id+"'>";
+        tr.cells[1].innerHTML = "<input form='editUser' type='text' id='edit_un' name='edit_un' maxlength='15' placeholder='username'>";
+        tr.cells[2].innerHTML = "<input form='editUser' type='text' id='edit_pw' name='edit_pw' maxlength='15' placeholder='password'>";
+        tr.cells[3].innerHTML = "<input form='editUser' type='text' id='edit_nn' name='edit_nn' maxlength='15' placeholder='nickname'>";
+        tr.cells[4].innerHTML = "<input form='editUser' type='submit' value='完成' id='finishEdit'>";
+        tr.cells[5].innerHTML = "<input form='editUser' type='submit' value='取消' id='cancelEdit' formaction='/manager'>";
+        tr.cells[6].innerHTML = "<form action='/managerEdit' id='editUser' method='post' role='form'></form>";
+        var BtnList = document.getElementsByClassName("EditBtn");
+        console.log(BtnList.length);
+        for (i = 0; i < BtnList.length; i++) {
+            BtnList[i].disabled = true;
+        }
+    }
+</script>
+
+<style>
+    #usertable{
+        border: 1px solid;
+        margin: auto;
+        width: 800px;
+    }
+    th {
+        border: 1px solid;
+    }
+</style>

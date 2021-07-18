@@ -264,7 +264,7 @@
     //根据存入的数据，分别显示（2+5）张对应的牌，下载图片素材时注意吻合命名方式以及图片格式，jpg or jpeg or ?
     for (m=0; m<2; m++){
       if (handcardinfo[m] == 0){
-        document.getElementById(handlist[m]).src = 'unknowncard.jpeg'
+        document.getElementById(handlist[m]).src = 'unknowncard.jpeg';
       }
       else if (handcardinfo[m].substring(0,2) == '黑桃'){
         document.getElementById(handlist[m]).src = 'spades' + handcardinfo[m][2] + '.jpg';
@@ -282,7 +282,7 @@
 
     for (n=0; n<5; n++){
       if (publicinfo[n] == 0){
-        document.getElementById(publiclist[n]).src = 'unknowncard.jpeg'
+        document.getElementById(publiclist[n]).src = 'unknowncard.jpeg';
       }
       else if (publicinfo[n].substring(0,2) == '黑桃'){
         document.getElementById(publiclist[n]).src = 'spades' + publicinfo[n][2] + '.jpg';

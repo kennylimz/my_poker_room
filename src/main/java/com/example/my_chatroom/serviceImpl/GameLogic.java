@@ -78,7 +78,10 @@ public class GameLogic {
             case 3 : suitName="方片"; break;
             default : suitName="Unknown";
         }
-        if (num==9){
+        if (num==8){
+            numName = "0";
+        }
+        else if (num==9){
             numName = "J";
         }
         else if (num==10){

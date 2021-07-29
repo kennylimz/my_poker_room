@@ -159,6 +159,7 @@ public class GameLogic {
         public int pot;
         public String publicLog;
         public HashMap<Integer, String> logMap;
+        public List<Integer> queue;
 
         public GameStatus() {
             opMap = new HashMap<>();
@@ -175,6 +176,7 @@ public class GameLogic {
             opMap = new HashMap<>();
             chipMap = new HashMap<>();
             btnMap = new HashMap<>();
+            queue = new ArrayList<>();
             maxBet = 0;
             roundNum = 0;
             pot = 0;
@@ -184,13 +186,14 @@ public class GameLogic {
                 btnMap.put(x, 0);
                 playerMap.get(x).hand.clear();
                 playerMap.get(x).handString = "hand";
+                queue.add(x);
             }
             deck = generateDeck(opMap.size()*2+5);
         }
 
         // 开始游戏时的判断
         public void start(){
-            if (checkFold()==true){
+            if (checkFold()){
                 return;
             }
             String temp;
@@ -259,7 +262,17 @@ public class GameLogic {
         // 盲注阶段
         public String blind(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (Player player : invPlayerMap.keySet()) {
+            List<Integer> tempQueue = new ArrayList<>(queue);
+            int sb = tempQueue.get(0);
+            tempQueue.remove(0);
+            tempQueue.add(sb);
+            int bb = tempQueue.get(0);
+            tempQueue.remove(0);
+            tempQueue.add(bb);
+            gameStatus.raise(sb, 5);
+            gameStatus.raise(bb, 10);
+            for (int playerId: tempQueue) {
+                Player player = playerMap.get(playerId);
                 if (player.hand.size()==0){
                     String temp;
                     int newCardId = deck.get(0);
@@ -290,7 +303,8 @@ public class GameLogic {
         // 翻牌阶段
         public String flop(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (Player player : invPlayerMap.keySet()) {
+            for (int playerId: queue) {
+                Player player = playerMap.get(playerId);
                 if (player.hand.size() == 2) {
                     int newCardId1 = deck.get(0);
                     deck.remove(0);
@@ -325,7 +339,8 @@ public class GameLogic {
         // 转牌阶段
         public String turn(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (Player player : invPlayerMap.keySet()) {
+            for (int playerId: queue) {
+                Player player = playerMap.get(playerId);
                 if (player.hand.size() == 5) {
                     int newCardId = deck.get(0);
                     deck.remove(0);
@@ -351,7 +366,8 @@ public class GameLogic {
         // 河牌阶段
         public String river(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (Player player : invPlayerMap.keySet()) {
+            for (int playerId: queue) {
+                Player player = playerMap.get(playerId);
                 if (player.hand.size() == 6) {
                     int newCardId = deck.get(0);
                     deck.remove(0);
@@ -396,6 +412,9 @@ public class GameLogic {
                 reset();
                 publicLog += handType+", draws.\n";
             }
+            int newButton = queue.get(0);
+            queue.remove(0);
+            queue.add(newButton);
         }
 
         // 检查弃牌

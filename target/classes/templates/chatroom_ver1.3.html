@@ -1,0 +1,373 @@
+<!--  Last update：2021.07.29 2p.m. by MagicWaterBee  version 1.3  -->
+<!-- 注意，用作封面图的girl.jpeg和后面的扑克牌图片需要重新下载到自己电脑上，并放在与当前代码文件同路径的地方 -->
+<!DOCTYPE html>
+<html>
+  <meta charset="UTF-8">
+  <head lang="en">
+    <title>My Chatroom!</title>
+  </head>
+  <body onload="checkCookie()">
+    <h1>多人激情♂在线德州</h1>
+    <img src="imgs/girl.jpg" height = '200' width = '350' />
+    <h6 id="helloSentence"></h6>
+    <button id="connectTo" onclick="connectWebSocket()">连接</button>
+    <button id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
+
+    <hr/>
+    <br/>
+
+    <div>
+      指令：<input id="instruction" type="text" maxlength="20"/>
+      <button onclick="sendInstruction()">发送指令</button>
+    </div>
+
+    <hr/>
+
+    <div>
+      消息：<br/>
+      <input id="chat_text" type="text" maxlength="40"/>
+      <button id="chat_button" onclick="sendChat()">发送消息</button>
+    </div>
+
+    <hr/>
+      <table border="8">   <!-- 设置边框 -->
+        <tr>
+          <th>ID</th>
+          <th>筹码</th>
+          <th>当前下注</th>
+          <th>当前最大下注</th>
+          <th>底池</th>
+          <th>手牌</th>
+          <th>公共牌</th>
+        </tr>
+        <tr>
+          <td id="userID"></td>
+          <td id="money"></td>
+          <td id="curBet"></td>
+          <td id="maxBet"></td>
+          <td id="pot"></td>
+          <td><img id="hand1" height = '50' width = '35'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
+            <img id="hand2" height = '50' width = '35'>
+          <td><img id="publicCard1" height = '50' width = '35'>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
+            <img id="publicCard2" height = '50' width = '35'>
+            <img id="publicCard3" height = '50' width = '35'>
+            <img id="publicCard4" height = '50' width = '35'>
+            <img id="publicCard5" height = '50' width = '35'>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center"><input id="chip" type="text" style="width: 50px;"/><button disabled id="raiseBtn" onclick="raiseBtn()">加注</button></td>
+          <td align="center"><button disabled id="callBtn" onclick="callBtn()">跟注</button></td>
+          <td align="center"><button disabled id="checkBtn" onclick="checkBtn()">过牌</button></td>
+          <td align="center"><button disabled id="foldBtn" onclick="foldBtn()">弃牌</button></td>
+        </tr>
+      </table>
+    <hr/>
+    <div id="message"></div>
+    <div id="gameLog"></div>
+  </body>
+</html>
+
+<script th:inline="javascript">
+  var websocket = null;
+  var loginNickname = null;
+  function connectWebSocket(){
+    //判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window){
+      //服务器的地址，现在用的是内网穿透的地址
+      websocket = new WebSocket("ws://localhost:8080/websocket/"+loginNickname);
+      document.getElementById("connectTo").disabled = true;
+      document.getElementById("disconnectFrom").disabled = false;
+    }
+    else{
+      alert('当前浏览器不支持websocket');
+    }
+
+    //连接发生错误的回调方法
+    websocket.onerror = function() {
+      setMessageInnerHTML("logerror");
+    };
+
+    //接收到消息的回调方法
+    websocket.onmessage = function(event) {
+      setMessageInnerHTML(event.data);
+    }
+
+    //连接关闭的回调方法
+    websocket.onclose = function() {
+      setMessageInnerHTML("logLoc MSG:关闭连接");
+    }
+
+    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function() {
+      websocket.close();
+    }
+  }
+
+  //将消息显示在网页上
+  function setMessageInnerHTML(innerHTML) {
+    if (innerHTML.indexOf("msg")==0){
+      innerHTML = innerHTML.slice(3);
+      var temp = document.getElementById('message').innerHTML;
+      document.getElementById('message').innerHTML = innerHTML + '<br/>' + temp;
+    }
+    else if (innerHTML.indexOf("log")==0){
+      innerHTML = innerHTML.slice(3);
+      var temp = document.getElementById('gameLog').innerHTML;
+      document.getElementById('gameLog').innerHTML = innerHTML + '<br/>' + temp;
+    }
+    else if (innerHTML.indexOf("sta")==0){
+      innerHTML = innerHTML.slice(3);
+      statusHandler(innerHTML);
+    }
+  }
+
+  //关闭连接
+  function closeWebSocket() {
+    websocket.close();
+    document.getElementById("connectTo").disabled = false;
+    document.getElementById("disconnectFrom").disabled = true;
+  }
+
+  //发送消息
+  function sendChat() {
+    var message = document.getElementById('chat_text').value;
+    if (message != "" && message != null){
+      document.getElementById('chat_text').value = "";
+      message = "cha"+message;
+      console.log("sendChat: "+message);
+      websocket.send(message);
+    }
+  }
+
+  //发送指令
+  function sendInstruction() {
+    var message = document.getElementById('instruction').value;
+    if (message != "" && message != null){
+      document.getElementById('instruction').value = "";
+      message = "ins"+message;
+      console.log("sendInstruction: "+message);
+      websocket.send(message);
+    }
+  }
+
+  document.addEventListener("keydown",keydown);
+  function keydown(event) {
+    //表示键盘监听所触发的事件，同时传递参数event
+    if (event.keyCode === 13) {
+      document.getElementById("chat_button").click();
+    }
+  }
+
+  // function getCookie(c_name) {
+  //   var c_value = document.cookie;
+  //   var c_start = c_value.indexOf(" " + c_name + "=");
+  //   if (c_start === -1) {
+  //     c_start = c_value.indexOf(c_name + "=");
+  //   }
+  //   if (c_start === -1) {
+  //     c_value = null;
+  //   }
+  //   else {
+  //     c_start = c_value.indexOf("=", c_start) + 1;
+  //     var c_end = c_value.indexOf(";", c_start);
+  //     if (c_end === -1) {
+  //       c_end = c_value.length;
+  //     }
+  //     c_value = unescape(c_value.substring(c_start,c_end));
+  //   }
+  //   return c_value;
+  // }
+
+  // function setCookie(c_name,c_value,exdays) {
+  //   var d = new Date();
+  //   d.setTime(d.getTime()+(exdays*24*60*60*1000));
+  //   var expires = "expires="+d.toGMTString();
+  //   document.cookie = c_name + "=" + c_value + "; " + expires;
+  // }
+
+  function checkCookie() {
+    username = [[${nickname}]];
+    // var username = getCookie("username");
+    // if (username == null || username === "") {
+    //   username = [[${nickname}]];
+    //   if (username !== "") {
+    //     setCookie("username", username, 30);
+    //   }
+    // }
+    loginNickname = username;
+    document.getElementById("helloSentence").innerHTML = "你好," + username + "!";
+  }
+
+  // function delCookie() {
+  //   var exp = new Date();
+  //   exp.setTime(exp.getTime() - 1);
+  //   var cval=getCookie("username");
+  //   if(cval!=null)
+  //     document.cookie= "username="+cval+";expires="+exp.toGMTString();
+  // }
+
+  function statusHandler(innerHTML){
+    var handlist = ['hand1','hand2'];
+    var publiclist = ["publicCard1","publicCard2","publicCard3","publicCard4","publicCard5"];
+    var handcardinfo = new Array(2).fill(0);
+    var publicinfo = new Array(5).fill(0);
+
+    var maxIndex = innerHTML.indexOf("max");
+    var curIndex = innerHTML.indexOf("cur");
+    var idIndex = innerHTML.indexOf("id");
+    var moneyIndex = innerHTML.indexOf("money");
+    var potIndex = innerHTML.indexOf("pot");
+    var statusIndex = innerHTML.indexOf("type");
+    var handIndex = innerHTML.indexOf("hand");
+    var publicIndex = innerHTML.indexOf("public");
+    document.getElementById("maxBet").innerText = innerHTML.slice(maxIndex+3,curIndex);
+    document.getElementById("curBet").innerText = innerHTML.slice(curIndex+3,idIndex);
+    document.getElementById("userID").innerText = innerHTML.slice(idIndex+2,moneyIndex);
+    document.getElementById("money").innerText = innerHTML.slice(moneyIndex+5,potIndex);
+    document.getElementById("pot").innerText = innerHTML.slice(potIndex+3,statusIndex);
+    var type = innerHTML.slice(statusIndex+4,handIndex);
+    if (type=="0"){
+      document.getElementById("raiseBtn").disabled = true;
+      document.getElementById("callBtn").disabled = true;
+      document.getElementById("checkBtn").disabled = true;
+      document.getElementById("foldBtn").disabled = true;
+    }
+    else if (type=="1"){
+      document.getElementById("raiseBtn").disabled = false;
+      document.getElementById("callBtn").disabled = true;
+      document.getElementById("checkBtn").disabled = false;
+      document.getElementById("foldBtn").disabled = false;
+    }
+    else if (type=="2"){
+      document.getElementById("raiseBtn").disabled = false;
+      document.getElementById("callBtn").disabled = false;
+      document.getElementById("checkBtn").disabled = true;
+      document.getElementById("foldBtn").disabled = false;
+    }
+    var handString;
+    var publicString;
+    if (publicIndex==-1){
+      handString = innerHTML.slice(handIndex+4);
+      publicString = "";
+    }
+    else{
+      handString = innerHTML.slice(handIndex+4,publicIndex);
+      publicString = innerHTML.slice(publicIndex+6);
+    }
+    //花色符号参考：http://www.52unicode.com/miscellaneous-symbols-zifu
+
+    //语义解析，分段存入数组中
+    for (i=0; i<(handString.length)/3; i++){
+      handcardinfo[i]= handString.slice(i*3,(i+1)*3);
+    }
+
+    for (j=0; j<(publicString.length)/3; j++){
+      publicinfo[j]= publicString.slice(j*3,(j+1)*3);
+    } 
+    
+    //根据存入的数据，分别显示（2+5）张对应的牌，下载图片素材时注意吻合命名方式以及图片格式，jpg or jpeg or ?
+    for (m=0; m<2; m++){
+      if (handcardinfo[m] == 0){
+        document.getElementById(handlist[m]).src = 'imgs/unknowncard.jpg';
+      }
+      else if (handcardinfo[m].substring(0,2) == '黑桃'){
+        document.getElementById(handlist[m]).src = 'imgs/spades' + handcardinfo[m][2] + '.jpg';
+      }
+      else if (handcardinfo[m].substring(0,2) == '红桃'){
+        document.getElementById(handlist[m]).src = 'imgs/hearts' + handcardinfo[m][2] + '.jpg';
+      }
+      else if (handcardinfo[m].substring(0,2) == '草花'){
+        document.getElementById(handlist[m]).src = 'imgs/clubs' + handcardinfo[m][2] + '.jpg';
+      }
+      else if (handcardinfo[m].substring(0,2) == '方片'){
+        document.getElementById(handlist[m]).src = 'imgs/diams' + handcardinfo[m][2] + '.jpg';
+      }
+    }
+
+    for (n=0; n<5; n++){
+      if (publicinfo[n] == 0){
+        document.getElementById(publiclist[n]).src = 'imgs/unknowncard.jpg';
+      }
+      else if (publicinfo[n].substring(0,2) == '黑桃'){
+        document.getElementById(publiclist[n]).src = 'imgs/spades' + publicinfo[n][2] + '.jpg';
+      }
+      else if (publicinfo[n].substring(0,2) == '红桃'){
+        document.getElementById(publiclist[n]).src = 'imgs/hearts' + publicinfo[n][2] + '.jpg';
+      }
+      else if (publicinfo[n].substring(0,2) == '草花'){
+        document.getElementById(publiclist[n]).src = 'imgs/clubs' + publicinfo[n][2] + '.jpg';
+      }
+      else if (publicinfo[n].substring(0,2) == '方片'){
+        document.getElementById(publiclist[n]).src = 'imgs/diams' + publicinfo[n][2] + '.jpg';
+      }
+    }
+  }
+
+  // function raiseBtn(){
+  //  websocket.send("operaise");
+  // }
+
+  //判断并发送筹码数量（暂时施工完毕于21.07.29）
+  function raiseBtn() {
+    var message = "operaise";
+    var chip = document.getElementById('chip').value;
+    var maxBet = document.getElementById('maxBet').innerText;
+    var curBet = document.getElementById('curBet').innerText;
+    if (chip != "" && chip != null && chip != " "){
+      if( parseInt(chip)+parseInt(curBet)>parseInt(maxBet)
+        && parseInt(chip)<document.getElementById('money').innerText
+        && chip%10==0 ){
+        document.getElementById('chip').value = "";
+        message += chip;
+        websocket.send(message);
+      }
+      else{
+        alert("请输入不小于当前最大加注，不大于筹码，且为10的倍数的筹码数值！");
+        document.getElementById('chip').value = "";
+      }
+    }
+    else{
+      alert("请输入有效文本！");
+    }
+  }
+
+  function callBtn(){
+    websocket.send("opecall");
+  }
+
+  function checkBtn(){
+    websocket.send("opecheck");
+  }
+
+  function foldBtn(){
+    websocket.send("opefold");
+  }
+</script>
+
+<style>
+  #message{
+    margin-top:40px;
+    width: 45vw;
+    border:1px solid gray;
+    padding:20px;
+    max-height: 40vh;
+    float: left;
+    overflow: auto;
+  }
+
+  #gameLog{
+    margin-top:40px;
+    width: 45vw;
+    border:1px solid gray;
+    padding:20px;
+    max-height: 40vh;
+    float: left;
+    overflow: auto;
+  }
+
+  #chat_text{
+    height: 50px;
+    width: 200px;
+  }
+</style>

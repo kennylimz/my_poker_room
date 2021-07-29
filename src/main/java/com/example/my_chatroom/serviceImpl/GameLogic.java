@@ -47,7 +47,7 @@ public class GameLogic {
             playerMap.put(newPlayerId,new Player(newPlayerId,name));
             gameStatus.logMap.put(newPlayerId,"");
             playerNum++;
-            gameStatus.reset();
+            gameStatus.reset(0);
         }
         System.out.println("玩家人数:"+playerNum);
         playerMap.values().forEach(x->System.out.println(x.playerName));
@@ -62,7 +62,7 @@ public class GameLogic {
         else {
             playerMap.remove(playerID);
             playerNum--;
-            gameStatus.reset();
+            gameStatus.reset(0);
         }
     }
 
@@ -172,11 +172,13 @@ public class GameLogic {
             logMap = new HashMap<>();
         }
 
-        public void reset(){
+        public void reset(int type){
             opMap = new HashMap<>();
             chipMap = new HashMap<>();
             btnMap = new HashMap<>();
-            queue = new ArrayList<>();
+            if (type==0){
+                queue = new ArrayList<>();
+            }
             maxBet = 0;
             roundNum = 0;
             pot = 0;
@@ -186,7 +188,9 @@ public class GameLogic {
                 btnMap.put(x, 0);
                 playerMap.get(x).hand.clear();
                 playerMap.get(x).handString = "hand";
-                queue.add(x);
+                if (type==0){
+                    queue.add(x);
+                }
             }
             deck = generateDeck(opMap.size()*2+5);
         }
@@ -269,8 +273,10 @@ public class GameLogic {
             int bb = tempQueue.get(0);
             tempQueue.remove(0);
             tempQueue.add(bb);
-            gameStatus.raise(sb, 5);
-            gameStatus.raise(bb, 10);
+            if (gameStatus.pot == 0){
+                gameStatus.raise(sb, 5);
+                gameStatus.raise(bb, 10);
+            }
             for (int playerId: tempQueue) {
                 Player player = playerMap.get(playerId);
                 if (player.hand.size()==0){
@@ -441,7 +447,7 @@ public class GameLogic {
             if (winList.size()==1){
                 playerMap.get(winList.get(0)).money += pot;
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
-                reset();
+                reset(1);
                 publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
             }
             else if (winList.size()>1){
@@ -449,15 +455,16 @@ public class GameLogic {
                 for (Integer i: winList){
                     playerMap.get(winList.get(i)).money += pot/winList.size();
                 }
-                reset();
+                reset(1);
                 publicLog += handType+", draws.\n";
             }
             else{
-                reset();
+                reset(1);
             }
             int newButton = queue.get(0);
             queue.remove(0);
             queue.add(newButton);
+            System.out.println(queue);
         }
 
         // 检查弃牌
@@ -475,11 +482,12 @@ public class GameLogic {
             }
             else{
                 playerMap.get(winnerId).money += pot;
-                reset();
+                reset(1);
                 publicLog += playerMap.get(winnerId).playerName+" wins!\n";
                 int newButton = queue.get(0);
                 queue.remove(0);
                 queue.add(newButton);
+                System.out.println(queue);
                 return true;
             }
         }

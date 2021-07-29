@@ -57,6 +57,10 @@ public class MyWebSocket {
             updateStatus(playerId);
         }
         broadcastLog("当前在线人数为："+webSocketSet.size());
+        // 更新状态栏
+        for (int i: gameLogic.playerMap.keySet()){
+            updateStatus(i);
+        }
     }
 
     /**
@@ -74,6 +78,10 @@ public class MyWebSocket {
         System.out.println(nickName+"下线了！当前在线人数为" + webSocketSet.size());
         //群发消息，告诉每一位
         broadcastLog(nickName+"下线，当前在线人数为："+webSocketSet.size());
+        // 更新状态栏
+        for (int i: gameLogic.playerMap.keySet()){
+            updateStatus(i);
+        }
     }
 
     /**
@@ -218,8 +226,8 @@ public class MyWebSocket {
             }
         }
         else if (instruction.indexOf("help")==0){
-            broadcastLog("list——玩家列表");
-            broadcastLog("start——开始一轮");
+            privateLog(instructor,"list——玩家列表");
+            privateLog(instructor,"start——开始一轮");
         }
         printLog();
     }

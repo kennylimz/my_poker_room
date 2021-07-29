@@ -17,7 +17,8 @@
     <br/>
 
     <div>
-      指令：<input id="instruction" type="text" maxlength="20"/>
+      指令（打help看操作列表）：<br/>
+      <input id="instruction" type="text" maxlength="20"/>
       <button onclick="sendInstruction()">发送指令</button>
     </div>
 
@@ -46,13 +47,13 @@
           <td id="curBet"></td>
           <td id="maxBet"></td>
           <td id="pot"></td>
-          <td><img id="hand1" height = '50' width = '35'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
-            <img id="hand2" height = '50' width = '35'>
-          <td><img id="publicCard1" height = '50' width = '35'>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
-            <img id="publicCard2" height = '50' width = '35'>
-            <img id="publicCard3" height = '50' width = '35'>
-            <img id="publicCard4" height = '50' width = '35'>
-            <img id="publicCard5" height = '50' width = '35'>
+          <td><img id="hand1" height = '100' width = '70'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
+            <img id="hand2" height = '100' width = '70'>
+          <td><img id="publicCard1" height = '100' width = '70'>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
+            <img id="publicCard2" height = '100' width = '70'>
+            <img id="publicCard3" height = '100' width = '70'>
+            <img id="publicCard4" height = '100' width = '70'>
+            <img id="publicCard5" height = '100' width = '70'>
           </td>
         </tr>
         <tr>
@@ -312,19 +313,18 @@
   function raiseBtn() {
     var message = "operaise";
     var chip = document.getElementById('chip').value;
-    var maxBet = document.getElementById('maxBet').value;
-    var curBet = document.getElementById('curBet').value;
+    var maxBet = document.getElementById('maxBet').innerText;
+    var curBet = document.getElementById('curBet').innerText;
     if (chip != "" && chip != null && chip != " "){
-      if(!isNaN(chip)
-        && Number(chip)%10==0
-        && (Number(chip)+Number(curBet)>=Number(maxBet))
-        && Number(chip)<=Number(document.getElementById('money').value)){
+      if( parseInt(chip)+parseInt(curBet)>parseInt(maxBet)
+        && parseInt(chip)<document.getElementById('money').innerText
+        && chip%10==0 ){
         document.getElementById('chip').value = "";
         message += chip;
         websocket.send(message);
       }
       else{
-        alert("请输入不小于“当前最大加注”，不大于"筹码"，且为10的倍数的筹码数值（数字）！");
+        alert("请输入不小于当前最大加注，不大于筹码，且为10的倍数的筹码数值！");
         document.getElementById('chip').value = "";
       }
     }

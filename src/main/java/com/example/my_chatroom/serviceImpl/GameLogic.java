@@ -27,14 +27,14 @@ public class GameLogic {
 
     public int addPlayer(String name){
         int newPlayerId = -1;
-        // 目前只支持双人
-        if (playerNum>=2){
+        // 多人
+        if (playerNum>=5){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
                 }
             }
-            spectatorMap.put(newPlayerId,new Player(newPlayerId,name));
+            spectatorMap.put(newPlayerId, new Player(newPlayerId,name));
             spectatorNum++;
         }
         // playerMap的键值对是playerID——Player实例
@@ -254,7 +254,7 @@ public class GameLogic {
                             opMap.put(i,0);
                         }
                     }
-                    compare();
+                    finalCheck();
                 }
             }
         }
@@ -390,27 +390,70 @@ public class GameLogic {
             return "pass";
         }
 
-        // 开牌阶段
-        public void compare(){
-            int result = judge();
-            if (result==0){
-                playerMap.get(0).money += pot;
-                String handType = handType(playerMap.get(0).handValue());
-                reset();
-                publicLog += handType+"! "+playerMap.get(0).playerName+" wins!\n";
+//        // 双人开牌阶段
+//        public void compare(){
+//            int result = judge();
+//            if (result==0){
+//                playerMap.get(0).money += pot;
+//                String handType = handType(playerMap.get(0).handValue());
+//                reset();
+//                publicLog += handType+"! "+playerMap.get(0).playerName+" wins!\n";
+//            }
+//            else if (result==1){
+//                playerMap.get(1).money += pot;
+//                String handType = handType(playerMap.get(1).handValue());
+//                reset();
+//                publicLog += handType+"! "+playerMap.get(1).playerName+" wins!\n";
+//            }
+//            else{
+//                playerMap.get(0).money += pot/2;
+//                playerMap.get(1).money += pot/2;
+//                String handType = handType(playerMap.get(0).handValue());
+//                reset();
+//                publicLog += handType+", draws.\n";
+//            }
+//            int newButton = queue.get(0);
+//            queue.remove(0);
+//            queue.add(newButton);
+//        }
+
+        // 多人开牌阶段
+        public void finalCheck(){
+            List<Integer> finalList = new ArrayList<>();
+            for (Integer playerId: playerMap.keySet()){
+                if (opMap.get(playerId)>=0){
+                    finalList.add(playerId);
+                }
             }
-            else if (result==1){
-                playerMap.get(1).money += pot;
-                String handType = handType(playerMap.get(1).handValue());
-                reset();
-                publicLog += handType+"! "+playerMap.get(1).playerName+" wins!\n";
+            int maxScore = 0;
+            List<Integer> winList = new ArrayList<>();
+            for (Integer i: finalList){
+                int temp = playerMap.get(i).handValue();
+                if (temp > maxScore){
+                    maxScore = temp;
+                    winList.clear();
+                    winList.add(i);
+                }
+                else if (temp == maxScore){
+                    winList.add(i);
+                }
             }
-            else{
-                playerMap.get(0).money += pot/2;
-                playerMap.get(1).money += pot/2;
-                String handType = handType(playerMap.get(0).handValue());
+            if (winList.size()==1){
+                playerMap.get(winList.get(0)).money += pot;
+                String handType = handType(playerMap.get(winList.get(0)).handValue());
+                reset();
+                publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
+            }
+            else if (winList.size()>1){
+                String handType = handType(playerMap.get(winList.get(0)).handValue());
+                for (Integer i: winList){
+                    playerMap.get(winList.get(i)).money += pot/winList.size();
+                }
                 reset();
                 publicLog += handType+", draws.\n";
+            }
+            else{
+                reset();
             }
             int newButton = queue.get(0);
             queue.remove(0);
@@ -434,16 +477,16 @@ public class GameLogic {
                 playerMap.get(winnerId).money += pot;
                 reset();
                 publicLog += playerMap.get(winnerId).playerName+" wins!\n";
+                int newButton = queue.get(0);
+                queue.remove(0);
+                queue.add(newButton);
                 return true;
             }
         }
 
-
         // 加注操作
         public void raise(int playerId, int chip){
-            for (int i: opMap.keySet()){
-                opMap.put(i, 0);
-            }
+            opMap.replaceAll((i, v) -> 0);
             opMap.put(playerId, 1);
             pot += chip;
             playerMap.get(playerId).money -= chip;

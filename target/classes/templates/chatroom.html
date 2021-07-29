@@ -1,4 +1,4 @@
-<!--  最新update：2021.07.18 9p.m. by mzc  version 1.1  -->
+<!--  Last update：2021.07.29 2p.m. by MagicWaterBee  version 1.3  -->
 <!-- 注意，用作封面图的girl.jpeg和后面的扑克牌图片需要重新下载到自己电脑上，并放在与当前代码文件同路径的地方 -->
 <!DOCTYPE html>
 <html>
@@ -34,6 +34,8 @@
         <tr>
           <th>ID</th>
           <th>筹码</th>
+          <th>当前下注</th>
+          <th>当前最大下注</th>
           <th>底池</th>
           <th>手牌</th>
           <th>公共牌</th>
@@ -41,6 +43,8 @@
         <tr>
           <td id="userID"></td>
           <td id="money"></td>
+          <td id="curBet"></td>
+          <td id="maxBet"></td>
           <td id="pot"></td>
           <td><img id="hand1" height = '50' width = '35'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
             <img id="hand2" height = '50' width = '35'>
@@ -52,10 +56,10 @@
           </td>
         </tr>
         <tr>
-          <td><button disabled id="raiseBtn" onclick="raiseBtn()">RAISE</button></td>
-          <td><button disabled id="callBtn" onclick="callBtn()">CALL</button></td>
-          <td><button disabled id="checkBtn" onclick="checkBtn()">CHECK</button></td>
-          <td><button disabled id="foldBtn" onclick="foldBtn()">FOLD</button></td>
+          <td colspan="2" align="center"><input id="chip" type="text" style="width: 50px;"/><button disabled id="raiseBtn" onclick="raiseBtn()">加注</button></td>
+          <td colspan="2" align="center"><button disabled id="callBtn" onclick="callBtn()">跟注</button></td>
+          <td align="center"><button disabled id="checkBtn" onclick="checkBtn()">过牌</button></td>
+          <td align="center"><button disabled id="foldBtn" onclick="foldBtn()">弃牌</button></td>
         </tr>
       </table>
     <hr/>
@@ -208,16 +212,17 @@
     var publiclist = ["publicCard1","publicCard2","publicCard3","publicCard4","publicCard5"];
     var handcardinfo = new Array(2).fill(0);
     var publicinfo = new Array(5).fill(0);
-    // <th>ID</th>
-    // <th>Money</th>
-    // <th>Pot</th>
-    // <th>Status</th>
+
+    var maxIndex = innerHTML.indexOf("max");
+    var curIndex = innerHTML.indexOf("cur");
     var idIndex = innerHTML.indexOf("id");
     var moneyIndex = innerHTML.indexOf("money");
     var potIndex = innerHTML.indexOf("pot");
     var statusIndex = innerHTML.indexOf("type");
     var handIndex = innerHTML.indexOf("hand");
     var publicIndex = innerHTML.indexOf("public");
+    document.getElementById("maxBet").innerText = innerHTML.slice(maxIndex+3,curIndex);
+    document.getElementById("curBet").innerText = innerHTML.slice(curIndex+3,idIndex);
     document.getElementById("userID").innerText = innerHTML.slice(idIndex+2,moneyIndex);
     document.getElementById("money").innerText = innerHTML.slice(moneyIndex+5,potIndex);
     document.getElementById("pot").innerText = innerHTML.slice(potIndex+3,statusIndex);
@@ -299,8 +304,33 @@
     }
   }
 
-  function raiseBtn(){
-    websocket.send("operaise");
+  // function raiseBtn(){
+  //  websocket.send("operaise");
+  // }
+
+  //判断并发送筹码数量（暂时施工完毕于21.07.29）
+  function raiseBtn() {
+    var message = "operaise";
+    var chip = document.getElementById('chip').value;
+    var maxBet = document.getElementById('maxBet').value;
+    var curBet = document.getElementById('curBet').value;
+    if (chip != "" && chip != null && chip != " "){
+      if(!isNaN(chip)
+        && Number(chip)%10==0
+        && (Number(chip)+Number(curBet)>=Number(maxBet))
+        && Number(chip)<=Number(document.getElementById('money').value)){
+        document.getElementById('chip').value = "";
+        message += chip;
+        websocket.send(message);
+      }
+      else{
+        alert("请输入不小于“当前最大加注”，不大于"筹码"，且为10的倍数的筹码数值（数字）！");
+        document.getElementById('chip').value = "";
+      }
+    }
+    else{
+      alert("请输入有效文本！");
+    }
   }
 
   function callBtn(){

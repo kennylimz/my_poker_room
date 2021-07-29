@@ -84,21 +84,21 @@ public class MyWebSocket {
     public void onMessage(String message, Session session) {
         if (message.indexOf("ins")==0){
             //获得指令
-            String instruction = message.substring(3,message.length());
+            String instruction = message.substring(3);
             BiMap<Session,Integer> SessiontoID = IDtoSession.inverse();
             int playerId = SessiontoID.get(session);
             System.out.println("来自"+connectmap.get(session).getNickName()+"的指令: " + instruction);
             instructionHandler(playerId, instruction);
         }
         else if(message.indexOf("cha")==0){
-            message = message.substring(3,message.length());
+            message = message.substring(3);
             String nickName=connectmap.get(session).getNickName();
             System.out.println("来自"+nickName+"的消息: " + message);
             //群发消息
             broadcastMsg(nickName+"："+message);
         }
         else if (message.indexOf("ope")==0){
-            String operation = message.substring(3,message.length());
+            String operation = message.substring(3);
             BiMap<Session,Integer> SessiontoID = IDtoSession.inverse();
             int playerId = SessiontoID.get(session);
             System.out.println("来自"+connectmap.get(session).getNickName()+"的操作: " + operation);
@@ -186,6 +186,8 @@ public class MyWebSocket {
         }
         int status = gameLogic.gameStatus.btnMap.get(playerId);
         String message = "";
+        message += "max"+gameLogic.gameStatus.maxBet;
+        message += "cur"+gameLogic.gameStatus.chipMap.get(playerId);
         message += "id"+playerId;
         message += "money"+gameLogic.playerMap.get(playerId).money;
         message += "pot"+gameLogic.gameStatus.pot;
@@ -224,18 +226,18 @@ public class MyWebSocket {
     /**
      * 处理操作
      */
-    public void operationHandler(int operator, String instruction){
-        if (instruction.equals("raise")){
-            int raiseNum = gameLogic.gameStatus.maxBet+100;
+    public void operationHandler(int operator, String operation){
+        if (operation.indexOf("raise")==0){
+            int raiseNum = Integer.valueOf(operation.substring(5));
             gameLogic.gameStatus.raise(operator,raiseNum);
         }
-        else if (instruction.equals("call")){
+        else if ("call".equals(operation)){
             gameLogic.gameStatus.call(operator);
         }
-        else if (instruction.equals("check")){
+        else if ("check".equals(operation)){
             gameLogic.gameStatus.check(operator);
         }
-        else if (instruction.equals("fold")){
+        else if ("fold".equals(operation)){
             gameLogic.gameStatus.fold(operator);
         }
         for (int i: gameLogic.playerMap.keySet()){

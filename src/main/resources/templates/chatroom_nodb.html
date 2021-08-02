@@ -198,6 +198,14 @@
       document.getElementById("checkBtn").disabled = true;
       document.getElementById("foldBtn").disabled = false;
     }
+    else if (type=="3"){
+      document.getElementById("raiseBtn").disabled = true;
+      document.getElementById("callBtn").disabled = true;
+      document.getElementById("checkBtn").disabled = true;
+      document.getElementById("foldBtn").disabled = true;
+      alert("没钱啦！");
+      closeWebSocket();
+    }
     var handString;
     var publicString;
     if (publicIndex==-1){
@@ -261,7 +269,7 @@
   //  websocket.send("operaise");
   // }
 
-  //判断并发送筹码数量（暂时施工完毕于21.07.29）
+  //判断并发送筹码数量
   function raiseBtn() {
     var message = "operaise";
     var chip = document.getElementById('chip').value;
@@ -269,14 +277,13 @@
     var curBet = document.getElementById('curBet').innerText;
     if (chip != "" && chip != null && chip != " "){
       if( parseInt(chip)+parseInt(curBet)>parseInt(maxBet)
-        && parseInt(chip)<document.getElementById('money').innerText
-        && chip%10==0 ){
+        && parseInt(chip)<=document.getElementById('money').innerText ){
         document.getElementById('chip').value = "";
         message += chip;
         websocket.send(message);
       }
       else{
-        alert("请输入不小于当前最大加注，不大于筹码，且为10的倍数的筹码数值！");
+        alert("请输入有效的的筹码数值！");
         document.getElementById('chip').value = "";
       }
     }

@@ -32,6 +32,7 @@ public class GameLogic {
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
+                    break;
                 }
             }
             spectatorMap.put(newPlayerId, new Player(newPlayerId,name));
@@ -42,9 +43,10 @@ public class GameLogic {
             for (int i=0; i<=playerNum; i++){
                 if (!playerMap.containsKey(i)){
                     newPlayerId = i;
+                    break;
                 }
             }
-            playerMap.put(newPlayerId,new Player(newPlayerId,name));
+            playerMap.put(newPlayerId, new Player(newPlayerId,name));
             gameStatus.logMap.put(newPlayerId,"");
             playerNum++;
             gameStatus.reset(0);
@@ -426,7 +428,7 @@ public class GameLogic {
             return "pass";
         }
 
-        // 多人开牌阶段
+        // 多人开牌
         public void finalCheck(){
             List<Integer> finalList = new ArrayList<>();
             for (Integer playerId: playerMap.keySet()){
@@ -450,7 +452,6 @@ public class GameLogic {
             if (winList.size()==1){
                 playerMap.get(winList.get(0)).money += pot;
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
-                reset(1);
                 publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
             }
             else if (winList.size()>1){
@@ -458,13 +459,9 @@ public class GameLogic {
                 for (Integer i: winList){
                     playerMap.get(winList.get(i)).money += pot/winList.size();
                 }
-                reset(1);
                 publicLog += handType+", draws.\n";
             }
-            else{
-                reset(1);
-            }
-            gameIsOn = false;
+            endRound();
         }
 
         // 检查弃牌
@@ -482,10 +479,21 @@ public class GameLogic {
             }
             else{
                 playerMap.get(winnerId).money += pot;
-                reset(1);
                 publicLog += playerMap.get(winnerId).playerName+" wins!\n";
-                gameIsOn = false;
+                endRound();
                 return true;
+            }
+        }
+
+        // 回合结束
+        public void endRound(){
+            reset(1);
+            gameIsOn = false;
+            for (Player player: playerMap.values()){
+                if (player.money<=0){
+                    publicLog += player.playerName + "没钱了！\n";
+                    gameStatus.btnMap.put(gameStatus.btnMap.get(player.playerId), 3);
+                }
             }
         }
 
@@ -507,10 +515,13 @@ public class GameLogic {
         public void call(int playerId){
             opMap.put(playerId, 1);
             int chip = maxBet-chipMap.get(playerId);
+            if (chip>playerMap.get(playerId).money){
+                chip = playerMap.get(playerId).money;
+            }
             playerMap.get(playerId).money -= chip;
             System.out.println(playerMap.get(playerId).playerName+"跟注"+(chip));
             publicLog += playerMap.get(playerId).playerName+"跟注"+chip+"\n";
-            chipMap.put(playerId, maxBet);
+            chipMap.put(playerId, chipMap.get(playerId)+chip);
             pot += chip;
             btnMap.put(playerId,0);
             start();
@@ -565,7 +576,7 @@ class Player{
         this.playerName = name;
         hand = new ArrayList<>();
         handString = "hand";
-        money = 20000;
+        money = 2000;
     }
 
     // 拿牌，并按顺序排列

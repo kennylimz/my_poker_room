@@ -213,9 +213,21 @@ public class MyWebSocket {
                 updateStatus(playerId);
             }
         }
+        else if (instruction.indexOf("money")==0){
+            for (Player player: gameLogic.playerMap.values()){
+                privateLog(instructor, player.playerId+","+player.playerName+": "+ player.money);
+            }
+        }
+        else if (instruction.indexOf("chips")==0){
+            for (Player player: gameLogic.playerMap.values()){
+                privateLog(instructor, player.playerId+","+player.playerName+": "+gameLogic.gameStatus.chipMap.get(player.playerId));
+            }
+        }
         else if (instruction.indexOf("help")==0){
             privateLog(instructor,"list——玩家列表");
-            privateLog(instructor,"start——开始一轮");
+            privateLog(instructor,"start——开始一局");
+            privateLog(instructor,"money——查看各玩家筹码数");
+            privateLog(instructor, "chips——查看本局下注情况");
         }
         printLog();
     }

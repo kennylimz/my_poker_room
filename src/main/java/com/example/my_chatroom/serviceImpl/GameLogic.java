@@ -28,7 +28,7 @@ public class GameLogic {
     public int addPlayer(String name){
         int newPlayerId = -1;
         // 多人
-        if (playerNum>=5){
+        if (playerNum>=4 || gameStatus.gameIsOn){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
@@ -62,7 +62,8 @@ public class GameLogic {
         else {
             playerMap.remove(playerID);
             playerNum--;
-            gameStatus.reset(0);
+            gameStatus.opMap.put(playerID, -1);
+            gameStatus.start();
         }
     }
 
@@ -160,6 +161,7 @@ public class GameLogic {
         public String publicLog;
         public HashMap<Integer, String> logMap;
         public List<Integer> queue;
+        public boolean gameIsOn;
 
         public GameStatus() {
             opMap = new HashMap<>();
@@ -170,29 +172,49 @@ public class GameLogic {
             pot = 0;
             publicLog = "";
             logMap = new HashMap<>();
+            gameIsOn = false;
         }
 
         public void reset(int type){
-            opMap = new HashMap<>();
-            chipMap = new HashMap<>();
-            btnMap = new HashMap<>();
-            if (type==0){
+            // type 0: 重新生成游戏
+            if (type == 0){
+                opMap = new HashMap<>();
+                chipMap = new HashMap<>();
+                btnMap = new HashMap<>();
                 queue = new ArrayList<>();
-            }
-            maxBet = 0;
-            roundNum = 0;
-            pot = 0;
-            for (Integer x: playerMap.keySet()){
-                opMap.put(x, 0);
-                chipMap.put(x, 0);
-                btnMap.put(x, 0);
-                playerMap.get(x).hand.clear();
-                playerMap.get(x).handString = "hand";
-                if (type==0){
+                maxBet = 0;
+                roundNum = 0;
+                pot = 0;
+                for (Integer x: playerMap.keySet()){
+                    opMap.put(x, 0);
+                    chipMap.put(x, 0);
+                    btnMap.put(x, 0);
+                    playerMap.get(x).hand.clear();
+                    playerMap.get(x).handString = "hand";
                     queue.add(x);
+                    deck = generateDeck(opMap.size()*2+5);
                 }
             }
-            deck = generateDeck(opMap.size()*2+5);
+            // type 1: 结束一轮游戏
+            else if (type == 1){
+                opMap = new HashMap<>();
+                chipMap = new HashMap<>();
+                btnMap = new HashMap<>();
+                maxBet = 0;
+                roundNum = 0;
+                pot = 0;
+                for (Integer x: playerMap.keySet()){
+                    opMap.put(x, 0);
+                    chipMap.put(x, 0);
+                    btnMap.put(x, 0);
+                    playerMap.get(x).hand.clear();
+                    playerMap.get(x).handString = "hand";
+                    deck = generateDeck(opMap.size()*2+5);
+                }
+                int newButton = queue.get(0);
+                queue.remove(0);
+                queue.add(newButton);
+            }
         }
 
         // 开始游戏时的判断
@@ -396,33 +418,6 @@ public class GameLogic {
             return "pass";
         }
 
-//        // 双人开牌阶段
-//        public void compare(){
-//            int result = judge();
-//            if (result==0){
-//                playerMap.get(0).money += pot;
-//                String handType = handType(playerMap.get(0).handValue());
-//                reset();
-//                publicLog += handType+"! "+playerMap.get(0).playerName+" wins!\n";
-//            }
-//            else if (result==1){
-//                playerMap.get(1).money += pot;
-//                String handType = handType(playerMap.get(1).handValue());
-//                reset();
-//                publicLog += handType+"! "+playerMap.get(1).playerName+" wins!\n";
-//            }
-//            else{
-//                playerMap.get(0).money += pot/2;
-//                playerMap.get(1).money += pot/2;
-//                String handType = handType(playerMap.get(0).handValue());
-//                reset();
-//                publicLog += handType+", draws.\n";
-//            }
-//            int newButton = queue.get(0);
-//            queue.remove(0);
-//            queue.add(newButton);
-//        }
-
         // 多人开牌阶段
         public void finalCheck(){
             List<Integer> finalList = new ArrayList<>();
@@ -461,10 +456,7 @@ public class GameLogic {
             else{
                 reset(1);
             }
-            int newButton = queue.get(0);
-            queue.remove(0);
-            queue.add(newButton);
-            System.out.println(queue);
+            gameIsOn = false;
         }
 
         // 检查弃牌
@@ -484,10 +476,7 @@ public class GameLogic {
                 playerMap.get(winnerId).money += pot;
                 reset(1);
                 publicLog += playerMap.get(winnerId).playerName+" wins!\n";
-                int newButton = queue.get(0);
-                queue.remove(0);
-                queue.add(newButton);
-                System.out.println(queue);
+                gameIsOn = false;
                 return true;
             }
         }
@@ -537,56 +526,6 @@ public class GameLogic {
             start();
         }
 
-        // 模拟一轮完整游戏的方法
-        public void roundSim(){
-            for (Player player: playerMap.values()){
-                player.hand.clear();
-            }
-            deck = generateDeck(opMap.size()*2+5);
-            for (Integer x: opMap.keySet()){
-                int newCardId = deck.get(0);
-                deck.remove(0);
-                logMap.put(x, logMap.get(x)+drawCard(x,newCardId)+"\n");
-            }
-            for (Integer x: opMap.keySet()){
-                int newCardId = deck.get(0);
-                deck.remove(0);
-                logMap.put(x, logMap.get(x)+drawCard(x,newCardId)+"\n");
-            }
-
-            int flop_1 = deck.get(0);
-            deck.remove(0);
-            int flop_2 = deck.get(0);
-            deck.remove(0);
-            int flop_3 = deck.get(0);
-            deck.remove(0);
-            System.out.println("Flop: "+getCardName(flop_1)+","+getCardName(flop_2)+","+getCardName(flop_3));
-            publicLog += "Flop: "+getCardName(flop_1)+","+getCardName(flop_2)+","+getCardName(flop_3)+"\n";
-            distributeCard(flop_1);
-            distributeCard(flop_2);
-            distributeCard(flop_3);
-
-            int turn_4 = deck.get(0);
-            deck.remove(0);
-            System.out.println("Turn: "+getCardName(turn_4));
-            publicLog += "Turn: "+getCardName(turn_4)+"\n";
-            distributeCard(turn_4);
-
-            int river_5 = deck.get(0);
-            deck.remove(0);
-            System.out.println("River: "+getCardName(river_5));
-            publicLog += "River: "+getCardName(river_5)+"\n";
-            distributeCard(river_5);
-
-            int judge = judge();
-            if (judge<2){
-                publicLog += handType(playerMap.get(judge).handValue())+"! "+playerMap.get(judge).playerName+" wins!\n";
-            }
-            else{
-                publicLog += "Draw!\n";
-            }
-        }
-
         // 抽卡，把牌加入对应player实例的手牌里
         public String drawCard(Integer playerId, Integer cardId){
             System.out.println(playerMap.get(playerId).playerName+" draws a "+getCardName(cardId));
@@ -601,22 +540,6 @@ public class GameLogic {
                 player.drawCard(cardId);
             }
             return "Deals a "+getCardName(cardId)+" to each one.";
-        }
-
-        // 根据牌的评分比大小，仅支持双人
-        public int judge(){
-            if (playerMap.get(0).handValue()>playerMap.get(1).handValue()){
-                System.out.println(handType(playerMap.get(0).handValue())+"! "+playerMap.get(0).playerName+" wins！");
-                return 0;
-            }
-            else if (playerMap.get(1).handValue()>playerMap.get(0).handValue()){
-                System.out.println(handType(playerMap.get(1).handValue())+"! "+playerMap.get(1).playerName+" wins！");
-                return 1;
-            }
-            else{
-                System.out.println("Draw!");
-                return 2;
-            }
         }
     }
 }

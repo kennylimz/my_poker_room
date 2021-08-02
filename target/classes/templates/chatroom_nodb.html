@@ -7,9 +7,8 @@
     <title>My Chatroom!</title>
   </head>
   <body onload="checkCookie()">
-    <h1>多人激情♂在线德州</h1>
-    <img src="imgs/girl.jpg" height = '200' width = '350' />
-    <h6 id="helloSentence"></h6>
+
+    <input id="nickname" type="text" maxlength="10"/>
     <button id="connectTo" onclick="connectWebSocket()">连接</button>
     <button id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
 
@@ -76,6 +75,7 @@
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window){
       //服务器的地址，现在用的是内网穿透的地址
+      loginNickname = document.getElementById('nickname').value;
       websocket = new WebSocket("ws://localhost:8080/websocket/"+loginNickname);
       document.getElementById("connectTo").disabled = true;
       document.getElementById("disconnectFrom").disabled = false;
@@ -159,54 +159,6 @@
       document.getElementById("chat_button").click();
     }
   }
-
-  // function getCookie(c_name) {
-  //   var c_value = document.cookie;
-  //   var c_start = c_value.indexOf(" " + c_name + "=");
-  //   if (c_start === -1) {
-  //     c_start = c_value.indexOf(c_name + "=");
-  //   }
-  //   if (c_start === -1) {
-  //     c_value = null;
-  //   }
-  //   else {
-  //     c_start = c_value.indexOf("=", c_start) + 1;
-  //     var c_end = c_value.indexOf(";", c_start);
-  //     if (c_end === -1) {
-  //       c_end = c_value.length;
-  //     }
-  //     c_value = unescape(c_value.substring(c_start,c_end));
-  //   }
-  //   return c_value;
-  // }
-
-  // function setCookie(c_name,c_value,exdays) {
-  //   var d = new Date();
-  //   d.setTime(d.getTime()+(exdays*24*60*60*1000));
-  //   var expires = "expires="+d.toGMTString();
-  //   document.cookie = c_name + "=" + c_value + "; " + expires;
-  // }
-
-  function checkCookie() {
-    username = [[${nickname}]];
-    // var username = getCookie("username");
-    // if (username == null || username === "") {
-    //   username = [[${nickname}]];
-    //   if (username !== "") {
-    //     setCookie("username", username, 30);
-    //   }
-    // }
-    loginNickname = username;
-    document.getElementById("helloSentence").innerHTML = "你好," + username + "!";
-  }
-
-  // function delCookie() {
-  //   var exp = new Date();
-  //   exp.setTime(exp.getTime() - 1);
-  //   var cval=getCookie("username");
-  //   if(cval!=null)
-  //     document.cookie= "username="+cval+";expires="+exp.toGMTString();
-  // }
 
   function statusHandler(innerHTML){
     var handlist = ['hand1','hand2'];

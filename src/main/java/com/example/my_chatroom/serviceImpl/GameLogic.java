@@ -28,7 +28,7 @@ public class GameLogic {
     public int addPlayer(String name){
         int newPlayerId = -1;
         // 多人
-        if (playerNum>=4 || gameStatus.gameIsOn){
+        if (playerNum>=3 || gameStatus.gameIsOn){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
@@ -60,10 +60,18 @@ public class GameLogic {
             spectatorNum--;
         }
         else {
-            playerMap.remove(playerID);
-            playerNum--;
-            gameStatus.opMap.put(playerID, -1);
-            gameStatus.start();
+            if (gameStatus.gameIsOn){
+                playerMap.remove(playerID);
+                playerNum--;
+                gameStatus.opMap.remove(playerID);
+                gameStatus.chipMap.remove(playerID);
+                gameStatus.btnMap.remove(playerID);
+                gameStatus.queue.removeIf(s->s.equals(playerID));
+            }
+            else{
+                playerMap.remove(playerID);
+                playerNum--;
+            }
         }
     }
 

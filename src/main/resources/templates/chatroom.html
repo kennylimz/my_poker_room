@@ -6,7 +6,7 @@
     <title>My Chatroom!</title>
   </head>
   
-  <body onload="checkCookie()" background="bg.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed; bottom;">
+  <body onload="checkCookie()" background="imgs/bg.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed; bottom;">
     
     <!-- 设置滚动字 -->
     <div align="center">
@@ -25,18 +25,18 @@
     <div align="center">
     <img src="imgs/girl.jpg" height = '200' width = '350'/>
     </div>
-    
-    <h6 id="helloSentence"></h6>
+
     <center>
-        <button align="center" id="connectTo" onclick="connectWebSocket()">连接</button>
-        <button align="center" id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
+      <h6 id="helloSentence" style="color:white"></h6>
+      <button align="center" id="connectTo" onclick="connectWebSocket()">连接</button>
+      <button align="center" id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
     </center>
 
     <!-- 蛇皮分割线尝试 -->
     <hr class="new">
     <br/>
 
-    <div align="center" style="color:white;">
+    <div align="center" style="color:black; background-color:gray;">
       游戏指令（打help看操作列表）：<br/>
       <input id="instruction" type="text" maxlength="30"/><br/>
       <button onclick="sendInstruction()">发送指令</button>
@@ -44,7 +44,7 @@
 
     <hr/>
 
-    <div>
+    <div align="center" style="color:black; background-color:gray;">
       消息：<br/>
       <input id="chat_text" type="text" maxlength="40"/>
       <button id="chat_button" onclick="sendChat()">发送消息</button>

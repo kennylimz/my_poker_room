@@ -1,7 +1,5 @@
-/*  最新update：2021.07.28 9p.m. by mzc  version 1.2  */
 package com.example.my_chatroom.serviceImpl;
 
-import com.example.my_chatroom.serviceImpl.GameLogic;
 import com.example.my_chatroom.bean.UserInfo;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -27,7 +25,7 @@ public class MyWebSocket {
     //用来存放每个客户端对应的MyWebSocket对象。
 
     private static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<>();
-    private static Map<Session, UserInfo> connectmap = new HashMap<>();
+    private static Map<Session, UserInfo> connectMap = new HashMap<>();
     private static BiMap<Integer, Session> IDtoSession = HashBiMap.create();
     private static GameLogic gameLogic = new GameLogic();
 
@@ -44,20 +42,24 @@ public class MyWebSocket {
         int playerId;
         this.session = session;
         UserInfo userInfo = new UserInfo(session.getId(), nickName);
-        connectmap.put(session, userInfo);
+        connectMap.put(session, userInfo);
         webSocketSet.add(this);
         playerId = gameLogic.addPlayer(nickName);
         IDtoSession.put(playerId,session);
-        System.out.println(nickName+"上线了！当前在线人数为" + webSocketSet.size());
+        System.out.println("【系统】"+nickName+"上线了！当前在线人数为" + webSocketSet.size()); //here
         //群发消息，告诉每一位
         if (playerId>5){
-            broadcastLog(nickName+"上线了！编号为："+playerId+"（旁观者）");
+            broadcastLog("【系统】"+nickName+"上线了！编号为："+playerId+"（旁观者）"); //here
         }
         else{
-            broadcastLog(nickName+"上线了！编号为："+playerId);
+            broadcastLog("【系统】"+nickName+"上线了！编号为："+playerId); //here
             updateStatus(playerId);
         }
-        broadcastLog("当前在线人数为："+webSocketSet.size());
+        broadcastLog("【系统】"+"当前在线人数为："+webSocketSet.size()); //here
+        // 更新状态栏
+        for (int i: gameLogic.playerMap.keySet()){
+            updateStatus(i);
+        }
     }
 
     /**
@@ -65,16 +67,20 @@ public class MyWebSocket {
      */
     @OnClose
     public void onClose() {
-        String nickName=connectmap.get(session).getNickName();
-        connectmap.remove(session);
+        String nickName= connectMap.get(session).getNickName();
+        connectMap.remove(session);
         webSocketSet.remove(this);
         BiMap<Session, Integer> SessiontoID = IDtoSession.inverse();
         int playerID = SessiontoID.get(session);
         SessiontoID.remove(session);
         gameLogic.removePlayer(playerID);
-        System.out.println(nickName+"下线了！当前在线人数为" + webSocketSet.size());
+        System.out.println("【系统】"+nickName+"下线了！当前在线人数为" + webSocketSet.size()); //here
         //群发消息，告诉每一位
-        broadcastLog(nickName+"下线，当前在线人数为："+webSocketSet.size());
+        broadcastLog("【系统】"+nickName+"下线，当前在线人数为：" + webSocketSet.size()); //here
+        // 更新状态栏
+        for (int i: gameLogic.playerMap.keySet()){
+            updateStatus(i);
+        }
     }
 
     /**
@@ -82,42 +88,34 @@ public class MyWebSocket {
      * @param message 客户端发送过来的消息
      * */
     @OnMessage
-    public void onMessage(String message, Session session) {  
+    public void onMessage(String message, Session session) {
         if (message.indexOf("ins")==0){
             //获得指令
-            String instruction = message.substring(3,message.length());
+            String instruction = message.substring(3);
             BiMap<Session,Integer> SessiontoID = IDtoSession.inverse();
             int playerId = SessiontoID.get(session);
-            System.out.println("来自"+connectmap.get(session).getNickName()+"的指令: " + instruction);
+            System.out.println("来自"+ connectMap.get(session).getNickName()+"的指令: " + instruction);
             instructionHandler(playerId, instruction);
         }
         else if(message.indexOf("cha")==0){
-            String chat_message = message.substring(3,message.length());
-            String nickName=connectmap.get(session).getNickName();
-            System.out.println("来自"+nickName+"的消息: " + chat_message);
+            message = message.substring(3);
+            String nickName= connectMap.get(session).getNickName();
+            System.out.println("来自"+nickName+"的消息: " + message);
             //群发消息
-            broadcastMsg(nickName+"："+chat_message);
+            broadcastMsg(nickName+"："+message);
         }
         else if (message.indexOf("ope")==0){
-            String operation = message.substring(3,message.length());
+            String operation = message.substring(3);
             BiMap<Session,Integer> SessiontoID = IDtoSession.inverse();
             int playerId = SessiontoID.get(session);
-            System.out.println("来自"+connectmap.get(session).getNickName()+"的操作: " + operation);
+            System.out.println("【玩家操作】"+"来自"+ connectMap.get(session).getNickName()+"的操作: " + operation); //here
             operationHandler(playerId,operation);
-        }
-        else if (message.indexOf("chi")==0){
-            String chip_raise = message.substring(3,message.length());
-            BiMap<Session,Integer> SessiontoID = IDtoSession.inverse();
-            int playerId = SessiontoID.get(session);
-            System.out.println("来自"+connectmap.get(session).getNickName()+"的操作: 加注" + chip_raise);
-            chip_raise_Handler(playerId, Number(chip_raise));
         }
     }
 
     /**
      * 发生错误时调用
-     *
-     */
+     * */
     @OnError
     public void onError(Session session, Throwable error) {
         System.out.println("发生错误");
@@ -149,9 +147,7 @@ public class MyWebSocket {
             e.printStackTrace();
         }
         message = "msg"+message;
-        //同步异步说明参考：http://blog.csdn.net/who_is_xiaoming/article/details/53287691
         IDtoSession.get(playerId).getAsyncRemote().sendText(message);
-        //异步发送消息.
     }
     /**
      * 群发日志
@@ -164,13 +160,11 @@ public class MyWebSocket {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //同步异步说明参考：http://blog.csdn.net/who_is_xiaoming/article/details/53287691
             item.session.getAsyncRemote().sendText(message);
-            //异步发送消息.
         }
     }
     /**
-     * 单发自定义消息
+     * 单发日志
      * */
     public void privateLog(int playerId, String message)  {
         try {
@@ -179,12 +173,10 @@ public class MyWebSocket {
             e.printStackTrace();
         }
         message = "log"+message;
-        //同步异步说明参考：http://blog.csdn.net/who_is_xiaoming/article/details/53287691
         IDtoSession.get(playerId).getAsyncRemote().sendText(message);
-        //异步发送消息.
     }
     /**
-     * 更新状态栏（已尝试性施工于21.07.28,修改部分为maxbet，即最大加注）
+     * 更新状态栏
      */
     public void updateStatus(int playerId) {
         try {
@@ -195,63 +187,53 @@ public class MyWebSocket {
         int status = gameLogic.gameStatus.btnMap.get(playerId);
         String message = "";
         message += "max"+gameLogic.gameStatus.maxBet;
+        message += "cur"+gameLogic.gameStatus.chipMap.get(playerId);
         message += "id"+playerId;
         message += "money"+gameLogic.playerMap.get(playerId).money;
         message += "pot"+gameLogic.gameStatus.pot;
         message += "type"+status;
         message += gameLogic.playerMap.get(playerId).handString;
         message = "sta"+message;
-        //同步异步说明参考：http://blog.csdn.net/who_is_xiaoming/article/details/53287691
         IDtoSession.get(playerId).getAsyncRemote().sendText(message);
-        //异步发送消息.
     }
     /**
      * 处理指令
      */
     public void instructionHandler(int instructor, String instruction){
-        if (instruction.indexOf("sim")==0){
-            gameLogic.gameStatus.roundSim();
-        }
-        else if (instruction.indexOf("list")==0){
+        if (instruction.indexOf("list")==0){
             Session session = IDtoSession.get(instructor);
             for (int i : IDtoSession.keySet()){
-                privateLog(instructor,i+"——"+connectmap.get(IDtoSession.get(i)).getNickName());
+                privateLog(instructor,i+"——"+ connectMap.get(IDtoSession.get(i)).getNickName());
             }
         }
         else if (instruction.indexOf("start")==0){
             gameLogic.gameStatus.start();
+            gameLogic.gameStatus.gameIsOn = true;
             for (int playerId: gameLogic.playerMap.keySet()){
                 updateStatus(playerId);
             }
         }
         else if (instruction.indexOf("help")==0){
-            broadcastLog("list——玩家列表");
-            broadcastLog("start——开始一轮");
+            privateLog(instructor,"list——玩家列表");
+            privateLog(instructor,"start——开始一轮");
         }
         printLog();
     }
     /**
-     * 处理加注操作（暂时施工完毕与21.07.28）
+     * 处理操作
      */
-    public void chip_raise_Handler(int operator, int chip){
-        gameLogic.gameStatus.raise(operator,chip);
-        for (int i: gameLogic.playerMap.keySet()){
-            updateStatus(i);
+    public void operationHandler(int operator, String operation){
+        if (operation.indexOf("raise")==0){
+            int raiseNum = Integer.parseInt(operation.substring(5));
+            gameLogic.gameStatus.raise(operator,raiseNum);
         }
-        printLog();
-    }
-
-    /**
-     * 处理其余操作（暂时施工完毕与21.07.28）
-     */
-    public void operationHandler(int operator, String instruction){
-        if (instruction.equals("call")){
+        else if ("call".equals(operation)){
             gameLogic.gameStatus.call(operator);
         }
-        else if (instruction.equals("check")){
+        else if ("check".equals(operation)){
             gameLogic.gameStatus.check(operator);
         }
-        else if (instruction.equals("fold")){
+        else if ("fold".equals(operation)){
             gameLogic.gameStatus.fold(operator);
         }
         for (int i: gameLogic.playerMap.keySet()){

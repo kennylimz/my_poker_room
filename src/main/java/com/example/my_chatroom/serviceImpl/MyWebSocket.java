@@ -207,10 +207,12 @@ public class MyWebSocket {
             }
         }
         else if (instruction.indexOf("start")==0){
-            gameLogic.gameStatus.start();
-            gameLogic.gameStatus.gameIsOn = true;
-            for (int playerId: gameLogic.playerMap.keySet()){
-                updateStatus(playerId);
+            if (!gameLogic.gameStatus.gameIsOn){
+                gameLogic.gameStatus.start();
+                gameLogic.gameStatus.gameIsOn = true;
+                for (int playerId: gameLogic.playerMap.keySet()){
+                    updateStatus(playerId);
+                }
             }
         }
         else if (instruction.indexOf("money")==0){

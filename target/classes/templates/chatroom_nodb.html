@@ -1,12 +1,12 @@
 <!--  Last update：2021.07.29 2p.m. by MagicWaterBee  version 1.3  -->
 <!-- 注意，用作封面图的girl.jpeg和后面的扑克牌图片需要重新下载到自己电脑上，并放在与当前代码文件同路径的地方 -->
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
   <meta charset="UTF-8">
   <head lang="en">
     <title>My Chatroom!</title>
   </head>
-  <body onload="checkCookie()">
+  <body>
 
     <input id="nickname" type="text" maxlength="10"/>
     <button id="connectTo" onclick="connectWebSocket()">连接</button>
@@ -203,7 +203,7 @@
       document.getElementById("callBtn").disabled = true;
       document.getElementById("checkBtn").disabled = true;
       document.getElementById("foldBtn").disabled = true;
-      alert("没钱啦！");
+      alert("没钱,寄了！");
       closeWebSocket();
     }
     var handString;
@@ -216,7 +216,6 @@
       handString = innerHTML.slice(handIndex+4,publicIndex);
       publicString = innerHTML.slice(publicIndex+6);
     }
-    //花色符号参考：http://www.52unicode.com/miscellaneous-symbols-zifu
 
     //语义解析，分段存入数组中
     for (i=0; i<(handString.length)/3; i++){

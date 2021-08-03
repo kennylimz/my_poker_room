@@ -5,19 +5,40 @@
   <head lang="en">
     <title>My Chatroom!</title>
   </head>
-  <body onload="checkCookie()">
-    <h1>多人激情♂在线德州</h1>
-    <img src="imgs/girl.jpg" height = '200' width = '350' />
+  
+  <body onload="checkCookie()" background="bg.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed; bottom;">
+    
+    <!-- 设置滚动字 -->
+    <div align="center">
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>多</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>人</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>在</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>线</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="95" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>♂</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>激</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>情</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>德</b></font></b></marquee>
+      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>州</b></font></b></marquee>
+    </div>
+    
+    <!-- 封面 -->
+    <div align="center">
+    <img src="imgs/girl.jpg" height = '200' width = '350'/>
+    </div>
+    
     <h6 id="helloSentence"></h6>
-    <button id="connectTo" onclick="connectWebSocket()">连接</button>
-    <button id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
+    <center>
+        <button align="center" id="connectTo" onclick="connectWebSocket()">连接</button>
+        <button align="center" id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
+    </center>
 
-    <hr/>
+    <!-- 蛇皮分割线尝试 -->
+    <hr class="new">
     <br/>
 
-    <div>
-      指令（打help看操作列表）：<br/>
-      <input id="instruction" type="text" maxlength="20"/>
+    <div align="center" style="color:white;">
+      游戏指令（打help看操作列表）：<br/>
+      <input id="instruction" type="text" maxlength="30"/><br/>
       <button onclick="sendInstruction()">发送指令</button>
     </div>
 
@@ -29,23 +50,23 @@
       <button id="chat_button" onclick="sendChat()">发送消息</button>
     </div>
 
-    <hr/>
-      <table border="8">   <!-- 设置边框 -->
+    <hr/><!-- 因背景被改动，字体全变为白色 -->
+      <table border="8" align="center" style="border-color: rgb(88, 22, 22); background-color:rgb(60, 92, 45);">   <!-- 设置边框 -->
         <tr>
-          <th>ID</th>
-          <th>筹码</th>
-          <th>当前下注</th>
-          <th>当前最大下注</th>
-          <th>底池</th>
-          <th>手牌</th>
-          <th>公共牌</th>
+          <th style="color:white ;">ID</th>
+          <th style="color:white ;">筹码</th>
+          <th style="color:white ;">当前下注</th>
+          <th style="color:white ;">当前最大下注</th>
+          <th style="color:white ;">底池</th>
+          <th style="color:white ;">手牌</th>
+          <th style="color:white ;">公共牌</th>
         </tr>
         <tr>
-          <td id="userID"></td>
-          <td id="money"></td>
-          <td id="curBet"></td>
-          <td id="maxBet"></td>
-          <td id="pot"></td>
+          <td style="color:white ;" id="userID"></td>
+          <td style="color:white ;" id="money"></td>
+          <td style="color:white ;" id="curBet"></td>
+          <td style="color:white ;" id="maxBet"></td>
+          <td style="color:white ;" id="pot"></td>
           <td><img id="hand1" height = '100' width = '70'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
             <img id="hand2" height = '100' width = '70'>
           <td><img id="publicCard1" height = '100' width = '70'>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
@@ -63,8 +84,8 @@
         </tr>
       </table>
     <hr/>
-    <div id="message"></div>
-    <div id="gameLog"></div>
+    <div id="message" style="background-color:white;"></div>
+    <div id="gameLog" style="background-color:white;"></div>
   </body>
 </html>
 
@@ -357,7 +378,7 @@
   #message{
     margin-top:40px;
     width: 45vw;
-    border:1px solid gray;
+    border:1px solid rgb(250, 249, 249);
     padding:20px;
     max-height: 40vh;
     float: left;
@@ -367,7 +388,7 @@
   #gameLog{
     margin-top:40px;
     width: 45vw;
-    border:1px solid gray;
+    border:1px solid rgb(233, 155, 155);
     padding:20px;
     max-height: 40vh;
     float: left;
@@ -377,5 +398,11 @@
   #chat_text{
     height: 50px;
     width: 200px;
+  }
+
+  /* Large rounded brown border */
+  hr.new{
+      border: 10px solid brown;
+      border-radius: 7px;
   }
 </style>

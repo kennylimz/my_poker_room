@@ -1,5 +1,4 @@
-<!--  Last update：2021.07.29 2p.m. by MagicWaterBee  version 1.3  -->
-<!-- 注意，用作封面图的girl.jpeg和后面的扑克牌图片需要重新下载到自己电脑上，并放在与当前代码文件同路径的地方 -->
+<!--  Last update：2021.08.03 10a.m. by MagicWaterBee  version 1.4  -->
 <!DOCTYPE html>
 <html>
   <meta charset="UTF-8">
@@ -245,6 +244,14 @@
       document.getElementById("callBtn").disabled = false;
       document.getElementById("checkBtn").disabled = true;
       document.getElementById("foldBtn").disabled = false;
+    }
+    else if (type=="3"){
+      document.getElementById("raiseBtn").disabled = true;
+      document.getElementById("callBtn").disabled = true;
+      document.getElementById("checkBtn").disabled = true;
+      document.getElementById("foldBtn").disabled = true;
+      alert("没钱,寄了！");
+      closeWebSocket();
     }
     var handString;
     var publicString;

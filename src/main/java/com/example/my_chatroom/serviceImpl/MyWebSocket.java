@@ -207,7 +207,7 @@ public class MyWebSocket {
             }
         }
         else if (instruction.indexOf("start")==0){
-            if (!gameLogic.gameStatus.gameIsOn){
+            if (!gameLogic.gameStatus.gameIsOn && gameLogic.playerNum>=2){
                 gameLogic.gameStatus.start();
                 gameLogic.gameStatus.gameIsOn = true;
                 for (int playerId: gameLogic.playerMap.keySet()){

@@ -229,7 +229,7 @@ public class MyWebSocket {
             privateLog(instructor,"list——玩家列表");
             privateLog(instructor,"start——开始一局");
             privateLog(instructor,"money——查看各玩家筹码数");
-            privateLog(instructor, "chips——查看本局下注情况");
+            privateLog(instructor,"chips——查看本局下注情况");
         }
         printLog();
     }

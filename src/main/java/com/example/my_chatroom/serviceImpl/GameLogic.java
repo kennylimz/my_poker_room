@@ -28,7 +28,7 @@ public class GameLogic {
     public int addPlayer(String name){
         int newPlayerId = -1;
         // 多人
-        if (playerNum>=3 || gameStatus.gameIsOn){
+        if (playerNum>=5 || gameStatus.gameIsOn){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
@@ -453,6 +453,7 @@ public class GameLogic {
                 playerMap.get(winList.get(0)).money += pot;
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
                 publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
+                publicLog += "他的手牌是："+playerMap.get(winList.get(0)).handString.substring(4,10);
             }
             else if (winList.size()>1){
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
@@ -492,14 +493,18 @@ public class GameLogic {
             for (Player player: playerMap.values()){
                 if (player.money<=0){
                     publicLog += player.playerName + "没钱了！\n";
-                    gameStatus.btnMap.put(gameStatus.btnMap.get(player.playerId), 3);
+                    gameStatus.btnMap.put(player.playerId,3);
                 }
             }
         }
 
         // 加注操作
         public void raise(int playerId, int chip){
-            opMap.replaceAll((i, v) -> 0);
+            for (int i: opMap.keySet()){
+                if (opMap.get(i)>=0) {
+                    opMap.put(i,0);
+                }
+            }
             opMap.put(playerId, 1);
             pot += chip;
             playerMap.get(playerId).money -= chip;
@@ -538,7 +543,7 @@ public class GameLogic {
 
         // 弃牌操作
         public void fold(int playerId){
-            opMap.put(playerId, -1);
+            opMap.put(playerId,-1);
             btnMap.put(playerId,0);
             System.out.println(playerMap.get(playerId).playerName+"弃牌");
             publicLog += playerMap.get(playerId).playerName+"弃牌\n";

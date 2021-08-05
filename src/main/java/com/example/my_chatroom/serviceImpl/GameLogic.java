@@ -28,7 +28,7 @@ public class GameLogic {
     public int addPlayer(String name){
         int newPlayerId = -1;
         // 多人
-        if (playerNum>=5 || gameStatus.gameIsOn){
+        if (playerNum>=7 || gameStatus.gameIsOn){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
@@ -453,7 +453,7 @@ public class GameLogic {
                 playerMap.get(winList.get(0)).money += pot;
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
                 publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
-                publicLog += "他的手牌是："+playerMap.get(winList.get(0)).handString.substring(4,10);
+                publicLog += "他的手牌是："+playerMap.get(winList.get(0)).handString.substring(4,10)+"\n";
             }
             else if (winList.size()>1){
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
@@ -581,7 +581,7 @@ class Player{
         this.playerName = name;
         hand = new ArrayList<>();
         handString = "hand";
-        money = 2000;
+        money = 1000;
     }
 
     // 拿牌，并按顺序排列

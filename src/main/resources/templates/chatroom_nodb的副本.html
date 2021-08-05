@@ -37,8 +37,8 @@
           <th>当前下注</th>
           <th>当前最大下注</th>
           <th>底池</th>
-          <th colspan="2">手牌</th>
-          <th colspan="5">公共牌</th>
+          <th>手牌</th>
+          <th>公共牌</th>
         </tr>
         <tr>
           <td id="userID"></td>
@@ -46,26 +46,23 @@
           <td id="curBet"></td>
           <td id="maxBet"></td>
           <td id="pot"></td>
-          <td><img id="hand1" height = '100' width = '70'></td>   <!-- 手牌上限为2，提前设置位置和牌框 -->
-          <td><img id="hand2" height = '100' width = '70'></td>
-          <td><img id="publicCard1" height = '100' width = '70'></td>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
-          <td><img id="publicCard2" height = '100' width = '70'></td>
-          <td><img id="publicCard3" height = '100' width = '70'></td>
-          <td><img id="publicCard4" height = '100' width = '70'></td>
-          <td><img id="publicCard5" height = '100' width = '70'></td>
+          <td colspan="2">
+            <img id="hand1" height = '100' width = '70'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
+            <img id="hand2" height = '100' width = '70'>
+          </td>
+          <td colspan="5">
+            <img id="publicCard1" height = '100' width = '70'>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
+            <img id="publicCard2" height = '100' width = '70'>
+            <img id="publicCard3" height = '100' width = '70'>
+            <img id="publicCard4" height = '100' width = '70'>
+            <img id="publicCard5" height = '100' width = '70'>
+          </td>
         </tr>
         <tr>
           <td colspan="2" align="center"><input id="chip" type="text" style="width: 50px;"/><button disabled id="raiseBtn" onclick="raiseBtn()">加注</button></td>
           <td align="center"><button disabled id="callBtn" onclick="callBtn()">跟注</button></td>
           <td align="center"><button disabled id="checkBtn" onclick="checkBtn()">过牌</button></td>
           <td align="center"><button disabled id="foldBtn" onclick="foldBtn()">弃牌</button></td>
-          <td id="hand1text"></td>
-          <td id="hand2text"></td>
-          <td id="publicCard1text"></td>
-          <td id="publicCard2text"></td>
-          <td id="publicCard3text"></td>
-          <td id="publicCard4text"></td>
-          <td id="publicCard5text"></td>
         </tr>
       </table>
     <hr/>
@@ -234,20 +231,11 @@
     
     //根据存入的数据，分别显示（2+5）张对应的牌，下载图片素材时注意吻合命名方式以及图片格式，jpg or jpeg or ?
     for (m=0; m<2; m++){
-      var string = handcardinfo[m];
-      if (string=='0'){
-          string = '';
-      }
-      else if (string.substring(2)=='0'){
-          string = string.substring(0,2)+'10';
-      }
-      document.getElementById(handlist[m]+'text').innerText = string;
       if (handcardinfo[m] == 0){
         document.getElementById(handlist[m]).src = 'imgs/unknowncard.jpg';
       }
       else if (handcardinfo[m].substring(0,2) == '黑桃'){
         document.getElementById(handlist[m]).src = 'imgs/spades' + handcardinfo[m][2] + '.jpg';
-        
       }
       else if (handcardinfo[m].substring(0,2) == '红桃'){
         document.getElementById(handlist[m]).src = 'imgs/hearts' + handcardinfo[m][2] + '.jpg';
@@ -261,14 +249,6 @@
     }
 
     for (n=0; n<5; n++){
-      var string = publicinfo[n];
-      if (string=='0'){
-          string = '';
-      }
-      else if (string.substring(2)=='0'){
-          string = string.substring(0,2)+'10';
-      }
-      document.getElementById(publiclist[n]+'text').innerText = string;
       if (publicinfo[n] == 0){
         document.getElementById(publiclist[n]).src = 'imgs/unknowncard.jpg';
       }
@@ -299,7 +279,7 @@
     var curBet = document.getElementById('curBet').innerText;
     if (chip != "" && chip != null && chip != " "){
       if( parseInt(chip)+parseInt(curBet)>parseInt(maxBet)
-        && parseInt(chip)<=document.getElementById('money').innerText){
+        && parseInt(chip)<=document.getElementById('money').innerText ){
         document.getElementById('chip').value = "";
         message += chip;
         websocket.send(message);

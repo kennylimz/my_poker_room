@@ -48,7 +48,7 @@ public class MyWebSocket {
         IDtoSession.put(playerId,session);
         System.out.println(nickName+"上线了！当前在线人数为" + webSocketSet.size());
         //群发消息，告诉每一位
-        if (playerId>5){
+        if (playerId>=9){
             broadcastLog(nickName+"上线了！编号为："+playerId+"（旁观者）");
         }
         else{
@@ -225,11 +225,23 @@ public class MyWebSocket {
                 privateLog(instructor, player.playerId+","+player.playerName+": "+gameLogic.gameStatus.chipMap.get(player.playerId));
             }
         }
+        else if (instruction.indexOf("reload")==0){
+            updateStatus(instructor);
+        }
+        else if (instruction.indexOf("remake")==0){
+            gameLogic.gameStatus.reset(0);
+            gameLogic.gameStatus.gameIsOn = false;
+            for (int i: gameLogic.playerMap.keySet()){
+                updateStatus(i);
+            }
+        }
         else if (instruction.indexOf("help")==0){
             privateLog(instructor,"list——玩家列表");
             privateLog(instructor,"start——开始一局");
             privateLog(instructor,"money——查看各玩家筹码数");
             privateLog(instructor,"chips——查看本局下注情况");
+            privateLog(instructor,"reload——重新加载代状态框");
+            privateLog(instructor,"remake——（出bug再用）重新加载游戏");
         }
         printLog();
     }

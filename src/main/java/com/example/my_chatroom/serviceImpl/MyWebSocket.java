@@ -226,7 +226,9 @@ public class MyWebSocket {
             }
         }
         else if (instruction.indexOf("reload")==0){
-            updateStatus(instructor);
+            if (gameLogic.playerMap.keySet().contains(instructor)){
+                updateStatus(instructor);
+            }
         }
         else if (instruction.indexOf("remake")==0){
             gameLogic.gameStatus.reset(0);

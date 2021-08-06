@@ -231,6 +231,9 @@ public class MyWebSocket {
             }
         }
         else if (instruction.indexOf("remake")==0){
+            for (int i: gameLogic.playerMap.keySet()){
+                gameLogic.playerMap.get(i).money += gameLogic.gameStatus.chipMap.get(i);
+            }
             gameLogic.gameStatus.reset(0);
             gameLogic.gameStatus.gameIsOn = false;
             for (int i: gameLogic.playerMap.keySet()){

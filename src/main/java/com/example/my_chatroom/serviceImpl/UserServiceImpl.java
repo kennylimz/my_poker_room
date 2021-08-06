@@ -31,11 +31,11 @@ public class UserServiceImpl implements UserService {
         else if(userMapper.getInfo(name,password)!=null){
             return false;
         }
-        else if(!userMapper.ifAvailable(name)){
+        else if(!userMapper.ifAvailable(name,nickname)){
             return false;
         }
         else {
-            userMapper.addInfo(name, password, nickname);
+            userMapper.addInfo(name, password, nickname, 0);
             return true;
         }
     }
@@ -56,10 +56,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editById(int id, String edit_un, String edit_pw, String edit_nn) {
+    public void editById(int id, String edit_un, String edit_pw, String edit_nn, int edit_mn) {
         userMapper.editUsername(id, edit_un);
         userMapper.editPassword(id, edit_pw);
         userMapper.editNickname(id, edit_nn);
+        userMapper.editMoney(id, edit_mn);
     }
 
     @Override
@@ -74,6 +75,13 @@ public class UserServiceImpl implements UserService {
             userBeanList.add(userMapper.getInfoFromId(i));
         }
         return userBeanList;
+    }
+
+    @Override
+    public void updateMoney(String nickname, int delta) {
+        int id = userMapper.getIdByNickname(nickname);
+        userMapper.addMoney(id, delta);
+        System.out.println("modify"+id+": "+delta);
     }
 }
 

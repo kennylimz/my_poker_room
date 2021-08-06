@@ -18,6 +18,7 @@ import java.util.List;
 public class PageController {
 
     private UserBean curUserBean;
+    private boolean someoneLogging = false;
 
     //将Service注入Web层
     @Autowired
@@ -36,13 +37,15 @@ public class PageController {
     @PostMapping(value = "/loginIn")
     public String login(String username, String password){
         UserBean userBean = userServiceImpl.loginIn(username, password);
-        if(userBean!=null){
+        if(userBean!=null && !someoneLogging){
             curUserBean = new UserBean(
                     userBean.getId(),
                     userBean.getUsername(),
                     userBean.getPassword(),
-                    userBean.getNickname()
+                    userBean.getNickname(),
+                    userBean.getMoney()
             );
+            someoneLogging = true;
             return "loginSuccess";
         }else {
             return "loginError";
@@ -64,6 +67,7 @@ public class PageController {
     @GetMapping(value = "/toChatroom")
     public String toChatroom(Model model) {
         model.addAttribute("nickname", curUserBean.getNickname());
+        someoneLogging = false;
         return "chatroom";
     }
 
@@ -78,12 +82,13 @@ public class PageController {
                 cnt++;
             }
         }
-        String[][] userArray = new String[cnt][4];
+        String[][] userArray = new String[cnt][5];
         for (int i=0; i<cnt; i++){
             userArray[i][0] = String.valueOf(userBeanList.get(i).getId());
             userArray[i][1] = userBeanList.get(i).getUsername();
             userArray[i][2] = userBeanList.get(i).getPassword();
             userArray[i][3] = userBeanList.get(i).getNickname();
+            userArray[i][4] = String.valueOf(userBeanList.get(i).getMoney());
         }
         model.addAttribute("userList", userArray);
         return "manager";
@@ -105,13 +110,15 @@ public class PageController {
     @PostMapping(value = "/managerLogIn")
     public String managerLogIn(String loginusername, String loginpassword){
         UserBean userBean = userServiceImpl.loginIn(loginusername, loginpassword);
-        if(userBean!=null){
+        if(userBean!=null && !someoneLogging){
             curUserBean = new UserBean(
                     userBean.getId(),
                     userBean.getUsername(),
                     userBean.getPassword(),
-                    userBean.getNickname()
+                    userBean.getNickname(),
+                    userBean.getMoney()
             );
+            someoneLogging = true;
             return "loginSuccess";
         }else {
             return "loginError";
@@ -119,9 +126,9 @@ public class PageController {
     }
 
     @PostMapping(value = "/managerEdit")
-    public String managerEdit(String edit_id, String edit_un, String edit_pw, String edit_nn, Model model){
+    public String managerEdit(String edit_id, String edit_un, String edit_pw, String edit_nn, String edit_mn, Model model){
         int id = Integer.valueOf(edit_id);
-        userServiceImpl.editById(id,edit_un,edit_pw,edit_nn);
+        userServiceImpl.editById(id,edit_un,edit_pw,edit_nn,Integer.valueOf(edit_mn));
         System.out.println(edit_id+edit_un);
         return manager(model);
     }
@@ -130,12 +137,13 @@ public class PageController {
     public String managerSearch(String searchName, Model model){
         List<UserBean> userBeanList= userServiceImpl.searchName(searchName);
         int cnt = userBeanList.size();
-        String[][] userArray = new String[cnt][4];
+        String[][] userArray = new String[cnt][5];
         for (int i=0; i<cnt; i++){
             userArray[i][0] = String.valueOf(userBeanList.get(i).getId());
             userArray[i][1] = userBeanList.get(i).getUsername();
             userArray[i][2] = userBeanList.get(i).getPassword();
             userArray[i][3] = userBeanList.get(i).getNickname();
+            userArray[i][4] = String.valueOf(userBeanList.get(i).getMoney());
         }
         model.addAttribute("userList", userArray);
         return "searchPage";

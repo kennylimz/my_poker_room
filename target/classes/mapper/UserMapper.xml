@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.my_chatroom.mapper.UserMapper">
-    <insert id="addInfo" parameterType="string">
-        INSERT INTO users (username, password, nickname) VALUES (#{Name},#{Password},#{Nickname})
+    <insert id="addInfo">
+        INSERT INTO users (username, password, nickname, money) VALUES (#{Name},#{Password},#{Nickname},#{Money})
     </insert>
 
     <update id="editUsername">
@@ -20,6 +20,16 @@
         WHERE id = #{id};
     </update>
 
+    <update id="editMoney">
+        UPDATE users SET money = #{Money}
+        WHERE id = #{id};
+    </update>
+
+    <update id="addMoney">
+        UPDATE users SET money = money+#{Money}
+        WHERE id = #{id};
+    </update>
+
     <delete id="deleteById" parameterType="int">
         DELETE FROM users
         WHERE id = #{id}
@@ -30,8 +40,13 @@
         WHERE username = #{Name} AND password = #{Password}
     </select>
 
+    <select id="getIdByNickname" parameterType="string" resultType="java.lang.Integer">
+        SELECT id FROM users
+        WHERE nickname = #{Nickname}
+    </select>
+
     <select id="ifAvailable" parameterType="string" resultType="java.lang.Boolean">
-        SELECT count(*)=0 FROM users WHERE username = #{Name}
+        SELECT count(*)=0 FROM users WHERE username = #{Name} OR nickname = #{Nickname}
     </select>
 
     <select id="getInfoFromId" parameterType="int" resultType="com.example.my_chatroom.bean.UserBean">
@@ -52,6 +67,5 @@
         SELECT IFNULL(id,0) FROM users
         WHERE nickname LIKE "%"#{searchName}"%"
     </select>
-
 
 </mapper>

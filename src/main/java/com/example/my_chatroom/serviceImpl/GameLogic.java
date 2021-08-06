@@ -1,8 +1,13 @@
 package com.example.my_chatroom.serviceImpl;
 
+import com.example.my_chatroom.mapper.UserMapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,12 +15,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class GameLogic {
     public BiMap<Integer, Player> playerMap;
     public BiMap<Integer, Player> spectatorMap;
     public int playerNum;
     public int spectatorNum;
     public GameStatus gameStatus;
+
+    @Autowired
+    public UserServiceImpl userService;
 
     public GameLogic() {
         playerMap = HashBiMap.create();
@@ -28,7 +37,7 @@ public class GameLogic {
     public int addPlayer(String name){
         int newPlayerId = -1;
         // 多人
-        if (playerNum>=7 || gameStatus.gameIsOn){
+        if (playerNum>=5 || gameStatus.gameIsOn){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
@@ -62,13 +71,27 @@ public class GameLogic {
             spectatorNum--;
         }
         else {
+//            int delta = playerMap.get(playerID).money-1000;
+//            userService.updateMoney(playerMap.get(playerID).playerName, delta);
             if (gameStatus.gameIsOn){
                 playerMap.remove(playerID);
                 playerNum--;
                 gameStatus.opMap.remove(playerID);
                 gameStatus.chipMap.remove(playerID);
                 gameStatus.btnMap.remove(playerID);
+                int nextId = 0;
+
                 gameStatus.queue.removeIf(s->s.equals(playerID));
+                gameStatus.tempQueue.removeIf(s->s.equals(playerID));
+                int tempId = gameStatus.queue.get(nextId);
+                if (!gameStatus.btnMap.containsValue(1)||!gameStatus.btnMap.containsValue(2)){
+                    if (gameStatus.chipMap.get(tempId) < gameStatus.maxBet){
+                        gameStatus.btnMap.put(tempId,2);
+                    }
+                    else {
+                        gameStatus.btnMap.put(tempId,1);
+                    }
+                }
             }
             else{
                 playerMap.remove(playerID);
@@ -171,6 +194,7 @@ public class GameLogic {
         public String publicLog;
         public HashMap<Integer, String> logMap;
         public List<Integer> queue;
+        public List<Integer> tempQueue;
         public boolean gameIsOn;
 
         public GameStatus() {
@@ -233,7 +257,19 @@ public class GameLogic {
                 return;
             }
             String temp;
-            if (roundNum==0){
+            if (roundNum==0 && pot==0){
+                tempQueue = new ArrayList<>(queue);
+                int sb = tempQueue.get(0);
+                tempQueue.remove(0);
+                tempQueue.add(sb);
+                int bb = tempQueue.get(0);
+                tempQueue.remove(0);
+                tempQueue.add(bb);
+                gameStatus.raise(sb, 5);
+                gameStatus.raise(bb, 10);
+                start();
+            }
+            else if (roundNum==0){
                 temp = blind();
                 if (temp.indexOf("wait")==0){
                     return;
@@ -245,6 +281,7 @@ public class GameLogic {
                             opMap.put(i,0);
                         }
                     }
+                    tempQueue = new ArrayList<>(queue);
                     start();
                 }
             }
@@ -260,6 +297,7 @@ public class GameLogic {
                             opMap.put(i,0);
                         }
                     }
+                    tempQueue = new ArrayList<>(queue);
                     start();
                 }
             }
@@ -275,6 +313,7 @@ public class GameLogic {
                             opMap.put(i,0);
                         }
                     }
+                    tempQueue = new ArrayList<>(queue);
                     start();
                 }
             }
@@ -298,17 +337,6 @@ public class GameLogic {
         // 盲注阶段
         public String blind(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            List<Integer> tempQueue = new ArrayList<>(queue);
-            int sb = tempQueue.get(0);
-            tempQueue.remove(0);
-            tempQueue.add(sb);
-            int bb = tempQueue.get(0);
-            tempQueue.remove(0);
-            tempQueue.add(bb);
-            if (gameStatus.pot == 0){
-                gameStatus.raise(sb, 5);
-                gameStatus.raise(bb, 10);
-            }
             for (int playerId: tempQueue) {
                 Player player = playerMap.get(playerId);
                 if (player.hand.size()==0){
@@ -341,7 +369,7 @@ public class GameLogic {
         // 翻牌阶段
         public String flop(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (int playerId: queue) {
+            for (int playerId: tempQueue) {
                 Player player = playerMap.get(playerId);
                 if (player.hand.size() == 2) {
                     int newCardId1 = deck.get(0);
@@ -377,7 +405,7 @@ public class GameLogic {
         // 转牌阶段
         public String turn(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (int playerId: queue) {
+            for (int playerId: tempQueue) {
                 Player player = playerMap.get(playerId);
                 if (player.hand.size() == 5) {
                     int newCardId = deck.get(0);
@@ -404,7 +432,7 @@ public class GameLogic {
         // 河牌阶段
         public String river(){
             BiMap<Player,Integer> invPlayerMap = playerMap.inverse();
-            for (int playerId: queue) {
+            for (int playerId: tempQueue) {
                 Player player = playerMap.get(playerId);
                 if (player.hand.size() == 6) {
                     int newCardId = deck.get(0);
@@ -458,7 +486,7 @@ public class GameLogic {
             else if (winList.size()>1){
                 String handType = handType(playerMap.get(winList.get(0)).handValue());
                 for (Integer i: winList){
-                    playerMap.get(winList.get(i)).money += pot/winList.size();
+                    playerMap.get(i).money += pot/winList.size();
                 }
                 publicLog += handType+", draws.\n";
             }
@@ -505,6 +533,11 @@ public class GameLogic {
                     opMap.put(i,0);
                 }
             }
+            while (tempQueue.get(0)!=playerId){
+                int temp = tempQueue.get(0);
+                tempQueue.remove(0);
+                tempQueue.add(temp);
+            }
             opMap.put(playerId, 1);
             pot += chip;
             playerMap.get(playerId).money -= chip;
@@ -513,6 +546,7 @@ public class GameLogic {
             btnMap.put(playerId,0);
             System.out.println(playerMap.get(playerId).playerName+"加注"+chip);
             publicLog += playerMap.get(playerId).playerName+"加注"+chip+"\n";
+            System.out.println(tempQueue);
             start();
         }
 
@@ -680,10 +714,11 @@ class Player{
             }
             int finalSuitNum = suitNum;
             List<Integer> temp = hand.stream()
-                    .filter(x -> ( (x<13*(finalSuitNum+1)) && (x>13*finalSuitNum) ))
+                    .filter(x -> ( (x<13*(finalSuitNum+1)) && (x>=13*finalSuitNum) ))
                     .sorted(Comparator.reverseOrder())
                     .map((Integer x)->(x%13))
                     .collect(Collectors.toList());
+            System.out.println("同花判断："+temp);
             handValue += temp.get(4)
                          +temp.get(3)*13
                          +temp.get(2)*13*13
@@ -783,6 +818,7 @@ class Player{
     // 判断顺子的函数，没顺子返回0，有顺子返回顺子中的最高牌
     public int isStraight(HashMap<Integer,Integer> numMap){
         List<Integer> temp = numMap.keySet().stream().distinct().sorted().collect(Collectors.toList());
+        System.out.println("判断顺子："+temp);
         // 算法由cyz提供
         int cnt = 0;
         for (int i=0; i<temp.size()-1; i++){

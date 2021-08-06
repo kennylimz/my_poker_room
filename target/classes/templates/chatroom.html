@@ -1,6 +1,6 @@
-<!--  Last update：2021.08.03 10a.m. by MagicWaterBee  version 1.4  -->
+<!--  Last update：2021.08.06 10a.m. by MagicWaterBee  version 1.5  -->
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
   <meta charset="UTF-8">
   <head lang="en">
     <title>My Chatroom!</title>
@@ -10,21 +10,20 @@
     
     <!-- 设置滚动字 -->
     <div align="center">
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>多</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>人</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>在</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>线</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="95" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>♂</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>激</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>情</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>德</b></font></b></marquee>
-      <marquee scrollamount=4 width=100 height=100 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 60pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>州</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>多</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>人</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>在</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>线</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>♂</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>激</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>情</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>德</b></font></b></marquee>
+      <marquee scrollamount=2 width=50 height=50 scrolldelay="10" align="center"><b><font style="font-weight: normal; font-size: 30pt; line-height: normal; font-style: normal; font-variant: normal" face=Helvetica color=#ffffff><b>州</b></font></b></marquee>
     </div>
-    
-    <!-- 封面 -->
-    <div align="center">
-    <img src="imgs/girl.jpg" height = '200' width = '350'/>
-    </div>
+
+<!--    <div align="center">-->
+<!--    <img src="imgs/girl.jpg" height = '200' width = '350'/>-->
+<!--    </div>-->
 
     <center>
       <h6 id="helloSentence" style="color:white"></h6>
@@ -32,11 +31,7 @@
       <button align="center" id="disconnectFrom" onclick="closeWebSocket()" disabled>断开连接</button>
     </center>
 
-    <!-- 蛇皮分割线尝试 -->
-    <hr class="new">
-    <br/>
-
-    <div align="center" style="color:black; background-color:gray;">
+    <div align="center" style="color:white;">
       游戏指令（打help看操作列表）：<br/>
       <input id="instruction" type="text" maxlength="30"/><br/>
       <button onclick="sendInstruction()">发送指令</button>
@@ -44,7 +39,7 @@
 
     <hr/>
 
-    <div align="center" style="color:black; background-color:gray;">
+    <div align="center" style="color:white;">
       消息：<br/>
       <input id="chat_text" type="text" maxlength="40"/>
       <button id="chat_button" onclick="sendChat()">发送消息</button>
@@ -53,34 +48,43 @@
     <hr/><!-- 因背景被改动，字体全变为白色 -->
       <table border="8" align="center" style="border-color: rgb(88, 22, 22); background-color:rgb(60, 92, 45);">   <!-- 设置边框 -->
         <tr>
-          <th style="color:white ;">ID</th>
-          <th style="color:white ;">筹码</th>
-          <th style="color:white ;">当前下注</th>
-          <th style="color:white ;">当前最大下注</th>
-          <th style="color:white ;">底池</th>
-          <th style="color:white ;">手牌</th>
-          <th style="color:white ;">公共牌</th>
+          <th style="color:white">ID</th>
+          <th style="color:white">筹码</th>
+          <th style="color:white">当前下注</th>
+          <th style="color:white">当前最大下注</th>
+          <th style="color:white">底池</th>
+          <th style="color:white" colspan="2">手牌</th>
+          <th style="color:white" colspan="5">公共牌</th>
         </tr>
         <tr>
-          <td style="color:white ;" id="userID"></td>
-          <td style="color:white ;" id="money"></td>
-          <td style="color:white ;" id="curBet"></td>
-          <td style="color:white ;" id="maxBet"></td>
-          <td style="color:white ;" id="pot"></td>
-          <td><img id="hand1" height = '100' width = '70'>   <!-- 手牌上限为2，提前设置位置和牌框 -->
-            <img id="hand2" height = '100' width = '70'>
-          <td><img id="publicCard1" height = '100' width = '70'>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
-            <img id="publicCard2" height = '100' width = '70'>
-            <img id="publicCard3" height = '100' width = '70'>
-            <img id="publicCard4" height = '100' width = '70'>
-            <img id="publicCard5" height = '100' width = '70'>
+          <td style="color:white" id="userID"></td>
+          <td style="color:white" id="money"></td>
+          <td style="color:white" id="curBet"></td>
+          <td style="color:white" id="maxBet"></td>
+          <td style="color:white" id="pot"></td>
+          <td><img id="hand1" height = '100' width = '70'></td>   <!-- 手牌上限为2，提前设置位置和牌框 -->
+          <td><img id="hand2" height = '100' width = '70'></td>
+          <td><img id="publicCard1" height = '100' width = '70'></td>   <!-- 公共牌上限为5，提前设置位置和牌框 -->
+          <td><img id="publicCard2" height = '100' width = '70'></td>
+          <td><img id="publicCard3" height = '100' width = '70'></td>
+          <td><img id="publicCard4" height = '100' width = '70'></td>
+          <td><img id="publicCard5" height = '100' width = '70'></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center">
+              <input id="chip" type="text" style="width: 50px;"/>
+              <button disabled id="raiseBtn" onclick="raiseBtn()">加注</button>
           </td>
-        </tr>
-        <tr>
-          <td colspan="2" align="center"><input id="chip" type="text" style="width: 50px;"/><button disabled id="raiseBtn" onclick="raiseBtn()">加注</button></td>
           <td align="center"><button disabled id="callBtn" onclick="callBtn()">跟注</button></td>
           <td align="center"><button disabled id="checkBtn" onclick="checkBtn()">过牌</button></td>
           <td align="center"><button disabled id="foldBtn" onclick="foldBtn()">弃牌</button></td>
+          <td style="color:white" id="hand1text"></td>
+          <td style="color:white" id="hand2text"></td>
+          <td style="color:white" id="publicCard1text"></td>
+          <td style="color:white" id="publicCard2text"></td>
+          <td style="color:white" id="publicCard3text"></td>
+          <td style="color:white" id="publicCard4text"></td>
+          <td style="color:white" id="publicCard5text"></td>
         </tr>
       </table>
     <hr/>
@@ -96,7 +100,7 @@
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window){
       //服务器的地址，现在用的是内网穿透的地址
-      websocket = new WebSocket("ws://localhost:8080/websocket/"+loginNickname);
+      websocket = new WebSocket("ws://4061c1n493.51vip.biz/websocket/"+loginNickname);
       document.getElementById("connectTo").disabled = true;
       document.getElementById("disconnectFrom").disabled = false;
     }
@@ -297,11 +301,20 @@
     
     //根据存入的数据，分别显示（2+5）张对应的牌，下载图片素材时注意吻合命名方式以及图片格式，jpg or jpeg or ?
     for (m=0; m<2; m++){
+      var string = handcardinfo[m];
+      if (string=='0'){
+          string = '';
+      }
+      else if (string.substring(2)=='0'){
+          string = string.substring(0,2)+'10';
+      }
+      document.getElementById(handlist[m]+'text').innerText = string;
       if (handcardinfo[m] == 0){
         document.getElementById(handlist[m]).src = 'imgs/unknowncard.jpg';
       }
       else if (handcardinfo[m].substring(0,2) == '黑桃'){
         document.getElementById(handlist[m]).src = 'imgs/spades' + handcardinfo[m][2] + '.jpg';
+        
       }
       else if (handcardinfo[m].substring(0,2) == '红桃'){
         document.getElementById(handlist[m]).src = 'imgs/hearts' + handcardinfo[m][2] + '.jpg';
@@ -315,6 +328,14 @@
     }
 
     for (n=0; n<5; n++){
+      var string = publicinfo[n];
+      if (string=='0'){
+          string = '';
+      }
+      else if (string.substring(2)=='0'){
+          string = string.substring(0,2)+'10';
+      }
+      document.getElementById(publiclist[n]+'text').innerText = string;
       if (publicinfo[n] == 0){
         document.getElementById(publiclist[n]).src = 'imgs/unknowncard.jpg';
       }
@@ -345,14 +366,13 @@
     var curBet = document.getElementById('curBet').innerText;
     if (chip != "" && chip != null && chip != " "){
       if( parseInt(chip)+parseInt(curBet)>parseInt(maxBet)
-        && parseInt(chip)<document.getElementById('money').innerText
-        && chip%10==0 ){
+        && parseInt(chip)<document.getElementById('money').innerText ){
         document.getElementById('chip').value = "";
         message += chip;
         websocket.send(message);
       }
       else{
-        alert("请输入不小于当前最大加注，不大于筹码，且为10的倍数的筹码数值！");
+        alert("请输入有效的的筹码数值！");
         document.getElementById('chip').value = "";
       }
     }

@@ -16,7 +16,9 @@ public interface UserService {
 
     void delById(int id);
 
-    void editById(int id, String edit_un, String edit_pw, String edit_nn);
+    void editById(int id, String edit_un, String edit_pw, String edit_nn, int edit_mn);
 
     List<UserBean> searchName(String searchName);
+
+    void updateMoney(String nickname, int delta);
 }

@@ -21,6 +21,7 @@
         <th>username</th>
         <th>password</th>
         <th>nickname</th>
+        <th>money</th>
         <th colspan="3">操作</th>
       </tr>
     </table>
@@ -105,9 +106,10 @@
     tr.cells[1].innerHTML = "<input form='editUser' type='text' id='edit_un' name='edit_un' maxlength='15' placeholder='username'>";
     tr.cells[2].innerHTML = "<input form='editUser' type='text' id='edit_pw' name='edit_pw' maxlength='15' placeholder='password'>";
     tr.cells[3].innerHTML = "<input form='editUser' type='text' id='edit_nn' name='edit_nn' maxlength='15' placeholder='nickname'>";
-    tr.cells[4].innerHTML = "<input form='editUser' type='submit' value='完成' id='finishEdit'>";
-    tr.cells[5].innerHTML = "<input form='editUser' type='submit' value='取消' id='cancelEdit' formaction='/manager'>";
-    tr.cells[6].innerHTML = "<form action='/managerEdit' id='editUser' method='post' role='form'></form>";
+    tr.cells[4].innerHTML = "<input form='editUser' type='text' id='edit_mn' name='edit_mn' maxlength='15' placeholder='money'>";
+    tr.cells[5].innerHTML = "<input form='editUser' type='submit' value='完成' id='finishEdit'>";
+    tr.cells[6].innerHTML = "<input form='editUser' type='submit' value='取消' id='cancelEdit' formaction='/manager'>";
+    tr.cells[7].innerHTML = "<form action='/managerEdit' id='editUser' method='post' role='form'></form>";
     var BtnList = document.getElementsByClassName("EditBtn");
     console.log(BtnList.length);
     for (i = 0; i < BtnList.length; i++) {

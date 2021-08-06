@@ -12,11 +12,13 @@ public interface UserMapper {
 
     UserBean getInfo(@Param("Name") String username, @Param("Password") String password);
 
-    void addInfo(@Param("Name") String username, @Param("Password") String password, @Param("Nickname") String nickname);
+    void addInfo(@Param("Name") String username, @Param("Password") String password, @Param("Nickname") String nickname, @Param("Money") int money);
 
-    Boolean ifAvailable(@Param("Name") String username);
+    Boolean ifAvailable(@Param("Name") String username, @Param("Nickname") String nickname);
 
     UserBean getInfoFromId(@Param("id") int id);
+
+    int getIdByNickname(@Param("Nickname") String Nickname);
 
     int getMaxId();
 
@@ -28,7 +30,11 @@ public interface UserMapper {
 
     void editNickname(@Param("id") int id, @Param("Nickname") String edit_nn);
 
+    void editMoney(@Param("id") int id, @Param("Money") int edit_mn);
+
     List<Integer> searchByName(@Param("searchName") String searchName);
 
     List<Integer> searchByNickName(@Param("searchName") String searchName);
+
+    void addMoney(@Param("id") int id, @Param("Money") int delta);
 }

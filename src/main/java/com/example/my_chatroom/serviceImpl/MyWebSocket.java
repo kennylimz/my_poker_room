@@ -249,13 +249,19 @@ public class MyWebSocket {
                 updateStatus(i);
             }
         }
+        else if (instruction.indexOf("result")==0){
+            for (String x: gameLogic.deltaMap.keySet()){
+                privateLog(instructor,x+"："+gameLogic.deltaMap.get(x));
+            }
+        }
         else if (instruction.indexOf("help")==0){
             privateLog(instructor,"list——玩家列表");
             privateLog(instructor,"start——开始一局");
             privateLog(instructor,"money——查看各玩家筹码数");
             privateLog(instructor,"chips——查看本局下注情况");
-            privateLog(instructor,"reload——重新加载代状态框");
-            privateLog(instructor,"remake——（出bug再用）重新加载游戏");
+            privateLog(instructor,"reload——重新加载状态框（当然，大概率卡了就是卡了");
+            privateLog(instructor,"remake——重新加载游戏（出bug再用");
+            privateLog(instructor,"result——当前战绩（断开连接后战绩才会记录");
         }
         printLog();
     }

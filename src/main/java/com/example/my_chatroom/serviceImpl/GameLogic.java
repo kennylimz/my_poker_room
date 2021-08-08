@@ -19,16 +19,15 @@ import java.util.stream.Collectors;
 public class GameLogic {
     public BiMap<Integer, Player> playerMap;
     public BiMap<Integer, Player> spectatorMap;
+    public HashMap<String, Integer> deltaMap;
     public int playerNum;
     public int spectatorNum;
     public GameStatus gameStatus;
 
-    @Autowired
-    public UserServiceImpl userService;
-
     public GameLogic() {
         playerMap = HashBiMap.create();
         spectatorMap = HashBiMap.create();
+        deltaMap = new HashMap<>();
         playerNum = 0;
         spectatorNum = 0;
         gameStatus = new GameStatus();
@@ -56,6 +55,9 @@ public class GameLogic {
                 }
             }
             playerMap.put(newPlayerId, new Player(newPlayerId,name));
+            if (!deltaMap.containsKey(name)){
+                deltaMap.put(name, 0);
+            }
             gameStatus.logMap.put(newPlayerId,"");
             playerNum++;
             gameStatus.reset(0);
@@ -71,8 +73,9 @@ public class GameLogic {
             spectatorNum--;
         }
         else {
-//            int delta = playerMap.get(playerID).money-1000;
-//            userService.updateMoney(playerMap.get(playerID).playerName, delta);
+            int delta = playerMap.get(playerID).money-1000;
+            String name = playerMap.get(playerID).playerName;
+            deltaMap.put(name, deltaMap.get(name)+delta);
             if (gameStatus.gameIsOn){
                 playerMap.remove(playerID);
                 playerNum--;
@@ -80,7 +83,6 @@ public class GameLogic {
                 gameStatus.chipMap.remove(playerID);
                 gameStatus.btnMap.remove(playerID);
                 int nextId = 0;
-
                 gameStatus.queue.removeIf(s->s.equals(playerID));
                 gameStatus.tempQueue.removeIf(s->s.equals(playerID));
                 int tempId = gameStatus.queue.get(nextId);

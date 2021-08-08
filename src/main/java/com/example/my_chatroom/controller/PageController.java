@@ -94,7 +94,7 @@ public class PageController {
 
     @PostMapping(value = "/delUser")
     public String delUser(String idToDel, Model model){
-        int id = Integer.valueOf(idToDel);
+        int id = Integer.parseInt(idToDel);
         userServiceImpl.delById(id);
         return manager(model);
     }
@@ -119,8 +119,8 @@ public class PageController {
 
     @PostMapping(value = "/managerEdit")
     public String managerEdit(String edit_id, String edit_un, String edit_pw, String edit_nn, String edit_mn, Model model){
-        int id = Integer.valueOf(edit_id);
-        userServiceImpl.editById(id,edit_un,edit_pw,edit_nn,Integer.valueOf(edit_mn));
+        int id = Integer.parseInt(edit_id);
+        userServiceImpl.editById(id, edit_un, edit_pw, edit_nn, Integer.parseInt(edit_mn));
         System.out.println(edit_id+edit_un);
         return manager(model);
     }

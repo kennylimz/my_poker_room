@@ -222,7 +222,15 @@ public class MyWebSocket {
         }
         else if (instruction.indexOf("chips")==0){
             for (Player player: gameLogic.playerMap.values()){
-                privateLog(instructor, player.playerId+","+player.playerName+": "+gameLogic.gameStatus.chipMap.get(player.playerId));
+                if (gameLogic.gameStatus.opMap.get(player.playerId)==-1){
+                    privateLog(instructor, player.playerId+","+player.playerName+": "+gameLogic.gameStatus.chipMap.get(player.playerId)+"（弃牌）");
+                }
+                else if (player.money == 0){
+                    privateLog(instructor, player.playerId+","+player.playerName+": "+gameLogic.gameStatus.chipMap.get(player.playerId)+"（ALL IN）");
+                }
+                else{
+                    privateLog(instructor, player.playerId+","+player.playerName+": "+gameLogic.gameStatus.chipMap.get(player.playerId));
+                }
             }
         }
         else if (instruction.indexOf("reload")==0){
@@ -236,6 +244,7 @@ public class MyWebSocket {
             }
             gameLogic.gameStatus.reset(0);
             gameLogic.gameStatus.gameIsOn = false;
+            broadcastLog("/remake");
             for (int i: gameLogic.playerMap.keySet()){
                 updateStatus(i);
             }

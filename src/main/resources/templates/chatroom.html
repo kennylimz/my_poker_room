@@ -100,7 +100,7 @@
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window){
       //服务器的地址，现在用的是内网穿透的地址
-      websocket = new WebSocket("ws://localhost:8080/websocket/"+loginNickname);
+      websocket = new WebSocket("ws://4061c1n493.51vip.biz//websocket/"+loginNickname);
       document.getElementById("connectTo").disabled = true;
       document.getElementById("disconnectFrom").disabled = false;
     }

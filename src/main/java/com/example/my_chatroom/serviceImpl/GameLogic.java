@@ -37,7 +37,7 @@ public class GameLogic {
     public int addPlayer(String name){
         int newPlayerId = -1;
         // 多人
-        if (playerNum>=5 || gameStatus.gameIsOn){
+        if (playerNum>=6 || gameStatus.gameIsOn){
             for (int i=10; i<=spectatorNum+10; i++){
                 if (!spectatorMap.containsKey(i)){
                     newPlayerId = i;
@@ -354,6 +354,7 @@ public class GameLogic {
                 }
                 if (opMap.get(invPlayerMap.get(player))==0){
                     publicLog += "Waiting for "+playerMap.get(player.playerId).playerName+"...\n";
+                    System.out.println("Waiting for "+playerMap.get(player.playerId).playerName+"...\n");
                     if (chipMap.get(invPlayerMap.get(player))==maxBet){
                         btnMap.put(invPlayerMap.get(player),1);
                     }
@@ -464,31 +465,58 @@ public class GameLogic {
                     finalList.add(playerId);
                 }
             }
-            int maxScore = 0;
-            List<Integer> winList = new ArrayList<>();
-            for (Integer i: finalList){
-                int temp = playerMap.get(i).handValue();
-                if (temp > maxScore){
-                    maxScore = temp;
-                    winList.clear();
-                    winList.add(i);
+
+            while (pot>0){
+                int maxScore = 0;
+                List<Integer> winList = new ArrayList<>();
+                for (Integer i: finalList){
+                    int temp = playerMap.get(i).handValue();
+                    if (temp > maxScore){
+                        maxScore = temp;
+                        winList.clear();
+                        winList.add(i);
+                    }
+                    else if (temp == maxScore){
+                        winList.add(i);
+                    }
                 }
-                else if (temp == maxScore){
-                    winList.add(i);
+
+                if (winList.size()==1){
+                    if (chipMap.get(winList.get(0))==maxBet){
+                        playerMap.get(winList.get(0)).money += pot;
+                        pot = 0;
+                    }
+                    else{
+                        int chip = chipMap.get(winList.get(0));
+                        for (Integer j: chipMap.keySet()){
+                            if (chipMap.get(j)>chip){
+                                pot -= chip;
+                                playerMap.get(winList.get(0)).money += chip;
+                                chipMap.put(j, chipMap.get(j)-chip);
+                            }
+                            else {
+                                pot -= chipMap.get(j);
+                                playerMap.get(winList.get(0)).money += chipMap.get(j);
+                                chipMap.put(j, 0);
+                            }
+                        }
+                    }
+                    String handType = handType(playerMap.get(winList.get(0)).handValue());
+                    publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
+                    System.out.println(handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n");
+                    publicLog += "他的手牌是："+playerMap.get(winList.get(0)).handString.substring(4,10)+"\n";
+                    System.out.println("他的手牌是："+playerMap.get(winList.get(0)).handString.substring(4,10)+"\n");
+                    finalList.removeIf(s -> s.equals(winList.get(0)));
                 }
-            }
-            if (winList.size()==1){
-                playerMap.get(winList.get(0)).money += pot;
-                String handType = handType(playerMap.get(winList.get(0)).handValue());
-                publicLog += handType+"! "+playerMap.get(winList.get(0)).playerName+" wins!\n";
-                publicLog += "他的手牌是："+playerMap.get(winList.get(0)).handString.substring(4,10)+"\n";
-            }
-            else if (winList.size()>1){
-                String handType = handType(playerMap.get(winList.get(0)).handValue());
-                for (Integer i: winList){
-                    playerMap.get(i).money += pot/winList.size();
+                else if (winList.size()>1){
+                    String handType = handType(playerMap.get(winList.get(0)).handValue());
+                    for (Integer i: winList){
+                        playerMap.get(i).money += pot/winList.size();
+                    }
+                    pot = 0;
+                    publicLog += handType+", draws.\n";
+                    System.out.println(handType+", draws.\n");
                 }
-                publicLog += handType+", draws.\n";
             }
             endRound();
         }
@@ -509,6 +537,7 @@ public class GameLogic {
             else{
                 playerMap.get(winnerId).money += pot;
                 publicLog += playerMap.get(winnerId).playerName+" wins!\n";
+                System.out.println(playerMap.get(winnerId).playerName+" wins!\n");
                 endRound();
                 return true;
             }
@@ -521,6 +550,7 @@ public class GameLogic {
             for (Player player: playerMap.values()){
                 if (player.money<=0){
                     publicLog += player.playerName + "没钱了！\n";
+                    System.out.println(player.playerName + "没钱了！\n");
                     gameStatus.btnMap.put(player.playerId,3);
                 }
             }

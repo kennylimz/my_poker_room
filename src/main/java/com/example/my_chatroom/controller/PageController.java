@@ -18,7 +18,6 @@ import java.util.List;
 public class PageController {
 
     private UserBean curUserBean;
-    private boolean someoneLogging = false;
 
     //将Service注入Web层
     @Autowired
@@ -35,9 +34,9 @@ public class PageController {
     }
 
     @PostMapping(value = "/loginIn")
-    public String login(String username, String password){
+    public String login(String username, String password, Model model){
         UserBean userBean = userServiceImpl.loginIn(username, password);
-        if(userBean!=null && !someoneLogging){
+        if(userBean!=null){
             curUserBean = new UserBean(
                     userBean.getId(),
                     userBean.getUsername(),
@@ -45,8 +44,8 @@ public class PageController {
                     userBean.getNickname(),
                     userBean.getMoney()
             );
-            someoneLogging = true;
-            return "loginSuccess";
+            model.addAttribute("nickname", curUserBean.getNickname());
+            return "chatroom";
         }else {
             return "loginError";
         }
@@ -63,13 +62,6 @@ public class PageController {
 
     @RequestMapping(value = "/toSignUp")
     public String toSignUp() {return "signup";}
-
-    @GetMapping(value = "/toChatroom")
-    public String toChatroom(Model model) {
-        model.addAttribute("nickname", curUserBean.getNickname());
-        someoneLogging = false;
-        return "chatroom";
-    }
 
     @RequestMapping(value = "/manager")
     public String manager(Model model){
@@ -108,9 +100,9 @@ public class PageController {
     }
 
     @PostMapping(value = "/managerLogIn")
-    public String managerLogIn(String loginusername, String loginpassword){
+    public String managerLogIn(String loginusername, String loginpassword, Model model){
         UserBean userBean = userServiceImpl.loginIn(loginusername, loginpassword);
-        if(userBean!=null && !someoneLogging){
+        if(userBean!=null){
             curUserBean = new UserBean(
                     userBean.getId(),
                     userBean.getUsername(),
@@ -118,8 +110,8 @@ public class PageController {
                     userBean.getNickname(),
                     userBean.getMoney()
             );
-            someoneLogging = true;
-            return "loginSuccess";
+            model.addAttribute("nickname", curUserBean.getNickname());
+            return "chatroom";
         }else {
             return "loginError";
         }

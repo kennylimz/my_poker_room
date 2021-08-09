@@ -90,6 +90,7 @@
     <hr/>
     <div id="message" style="background-color:white;"></div>
     <div id="gameLog" style="background-color:white;"></div>
+    <audio id="xiaoxi" src="imgs/xiaoxi.wav"></audio>
   </body>
 </html>
 
@@ -259,12 +260,14 @@
       document.getElementById("foldBtn").disabled = true;
     }
     else if (type=="1"){
+      document.getElementById("xiaoxi").play();
       document.getElementById("raiseBtn").disabled = false;
       document.getElementById("callBtn").disabled = true;
       document.getElementById("checkBtn").disabled = false;
       document.getElementById("foldBtn").disabled = false;
     }
     else if (type=="2"){
+      document.getElementById("xiaoxi").play();
       document.getElementById("raiseBtn").disabled = false;
       document.getElementById("callBtn").disabled = false;
       document.getElementById("checkBtn").disabled = true;

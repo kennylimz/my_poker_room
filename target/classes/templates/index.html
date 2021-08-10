@@ -7,5 +7,12 @@
     <body>
         你好！我是SpringBoot的简单启动页面！ made by lmz<br/>
         <button type="button" onclick="window.location.href='/login'">登录/注册</button>
+        <h6 id="sentence" style="color:red"></h6>
     </body>
 </html>
+
+<script>
+    if ( /Android|webOS|MicroMessenger|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        document.getElementById('sentence').innerHTML = "建议使用PC浏览器打开本应用！";
+    }
+</script>

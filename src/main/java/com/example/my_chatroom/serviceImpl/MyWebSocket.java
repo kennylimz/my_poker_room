@@ -3,6 +3,7 @@ package com.example.my_chatroom.serviceImpl;
 import com.example.my_chatroom.bean.UserInfo;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import org.springframework.jdbc.support.incrementer.SybaseAnywhereMaxValueIncrementer;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -60,6 +61,9 @@ public class MyWebSocket {
         for (int i: gameLogic.playerMap.keySet()){
             updateStatus(i);
         }
+        for (int j: gameLogic.spectatorMap.keySet()){
+            updateObserver(j);
+        }
     }
 
     /**
@@ -80,6 +84,9 @@ public class MyWebSocket {
         // 更新状态栏
         for (int i: gameLogic.playerMap.keySet()){
             updateStatus(i);
+        }
+        for (int j: gameLogic.spectatorMap.keySet()){
+            updateObserver(j);
         }
     }
 
@@ -185,7 +192,7 @@ public class MyWebSocket {
             e.printStackTrace();
         }
         int status = gameLogic.gameStatus.btnMap.get(playerId);
-        String message = "";
+        String message = "sta";
         message += "max"+gameLogic.gameStatus.maxBet;
         message += "cur"+gameLogic.gameStatus.chipMap.get(playerId);
         message += "id"+playerId;
@@ -193,8 +200,28 @@ public class MyWebSocket {
         message += "pot"+gameLogic.gameStatus.pot;
         message += "type"+status;
         message += gameLogic.playerMap.get(playerId).handString;
-        message = "sta"+message;
         IDtoSession.get(playerId).getAsyncRemote().sendText(message);
+    }
+    /*
+     * 更新旁观者状态栏
+     */
+    public void updateObserver(int spectatorId){
+        try {
+            Thread.sleep((long) (Math.random() * 100));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        String message = "ob";
+        if (gameLogic.gameStatus.gameIsOn){
+            Player player = gameLogic.playerMap.get(gameLogic.gameStatus.queue.get(0));
+            String hand = player.handString;
+            int publicIndex = hand.indexOf("public");
+            if (publicIndex>0){
+                message += hand.substring(publicIndex+6);
+            }
+            System.out.println(message);
+        }
+        IDtoSession.get(spectatorId).getAsyncRemote().sendText(message);
     }
     /**
      * 处理指令
@@ -212,6 +239,9 @@ public class MyWebSocket {
                 gameLogic.gameStatus.gameIsOn = true;
                 for (int playerId: gameLogic.playerMap.keySet()){
                     updateStatus(playerId);
+                }
+                for (int j: gameLogic.spectatorMap.keySet()){
+                    updateObserver(j);
                 }
             }
         }
@@ -237,6 +267,9 @@ public class MyWebSocket {
             if (gameLogic.playerMap.keySet().contains(instructor)){
                 updateStatus(instructor);
             }
+            else if (gameLogic.spectatorMap.keySet().contains(instructor)){
+                updateObserver(instructor);
+            }
         }
         else if (instruction.indexOf("remake")==0){
             for (int i: gameLogic.playerMap.keySet()){
@@ -247,6 +280,9 @@ public class MyWebSocket {
             broadcastLog("/remake");
             for (int i: gameLogic.playerMap.keySet()){
                 updateStatus(i);
+            }
+            for (int j: gameLogic.spectatorMap.keySet()){
+                updateObserver(j);
             }
         }
         else if (instruction.indexOf("result")==0){
@@ -284,6 +320,9 @@ public class MyWebSocket {
         }
         for (int i: gameLogic.playerMap.keySet()){
             updateStatus(i);
+        }
+        for (int j: gameLogic.spectatorMap.keySet()){
+            updateObserver(j);
         }
         printLog();
     }

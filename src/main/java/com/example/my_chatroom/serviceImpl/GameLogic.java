@@ -260,15 +260,7 @@ public class GameLogic {
             }
             String temp;
             if (roundNum==0 && pot==0){
-                tempQueue = new ArrayList<>(queue);
-                int sb = tempQueue.get(0);
-                tempQueue.remove(0);
-                tempQueue.add(sb);
-                int bb = tempQueue.get(0);
-                tempQueue.remove(0);
-                tempQueue.add(bb);
-                gameStatus.raise(sb, 5);
-                gameStatus.raise(bb, 10);
+                smallBigBlind(5);
                 start();
             }
             else if (roundNum==0){
@@ -334,6 +326,27 @@ public class GameLogic {
                     finalCheck();
                 }
             }
+        }
+
+        // 大小盲加注
+        public void smallBigBlind(int smallBlind){
+            tempQueue = new ArrayList<>(queue);
+            int sb = tempQueue.get(0);
+            tempQueue.remove(0);
+            tempQueue.add(sb);
+            int bb = tempQueue.get(0);
+            tempQueue.remove(0);
+            tempQueue.add(bb);
+            pot += 3*smallBlind;
+            chipMap.put(sb,smallBlind);
+            chipMap.put(bb,2*smallBlind);
+            playerMap.get(sb).money -= smallBlind;
+            playerMap.get(bb).money -= 2*smallBlind;
+            maxBet = 2*smallBlind;
+            System.out.println(playerMap.get(sb).playerName+"盲注"+smallBlind);
+            System.out.println(playerMap.get(bb).playerName+"盲注"+2*smallBlind);
+            publicLog += playerMap.get(sb).playerName+"盲注"+smallBlind+"\n";
+            publicLog += playerMap.get(bb).playerName+"盲注"+2*smallBlind+"\n";
         }
 
         // 盲注阶段
